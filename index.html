@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VR Mover - ACM UIST 2025</title>
+    <meta name="description" content="Can You Move These Over There? Exploring an LLM-based VR Mover to Support Natural Multi-object Manipulation">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-container-main">
+                    <img src="assets/vr-mover-logo-wo-text.svg" alt="VR Mover Logo" class="main-logo">
+                </div>
+                <h1 class="title">VR Mover</h1>
+                <p class="subtitle">Can You Move These Over There? Exploring an LLM-based VR Mover to Support Natural Multi-object Manipulation</p>
+                <div class="authors">
+                    <span><a href="https://orcid.org/0009-0001-4772-7210" target="_blank" rel="noopener noreferrer">Xiangzhi Eric Wang</a></span><sup>1</sup><span class="equal-contrib">*</span>, 
+                    <span><a href="https://orcid.org/0000-0002-8377-0216" target="_blank" rel="noopener noreferrer">Zackary P. T. Sin</a></span><sup>1</sup><span class="equal-contrib">*</span><span class="corresponding">†</span>,
+                    <span><a href="https://orcid.org/0000-0002-0457-8083" target="_blank" rel="noopener noreferrer">Ye Jia</a></span><sup>1</sup>,
+                    <span><a href="https://orcid.org/0000-0002-2525-8054" target="_blank" rel="noopener noreferrer">Daniel Archer</a></span><sup>2</sup>,
+                    <span><a href="https://orcid.org/0009-0007-6625-4993" target="_blank" rel="noopener noreferrer">Wynonna H. Y. Fong</a></span><sup>3</sup>,
+                    <span><a href="https://orcid.org/0000-0003-3370-471X" target="_blank" rel="noopener noreferrer">Qing Li</a></span><sup>1</sup>,
+                    <span><a href="https://orcid.org/0000-0002-3782-0737" target="_blank" rel="noopener noreferrer">Chen Li</a></span><sup>1</sup>
+                </div>
+                <div class="author-notes">
+                    <span class="note-item"><span class="equal-contrib">*</span> Equal contribution</span>
+                    <span class="note-item"><span class="corresponding">†</span> <a href="mailto:zackary-p-t.sin@polyu.edu.hk">Corresponding author</a></span>
+                </div>
+                <div class="affiliations">
+                    <sup>1</sup>The Hong Kong Polytechnic University, Hong Kong SAR, China<br>
+                    <sup>2</sup>University College London, London, United Kingdom<br>
+                    <sup>3</sup>Heep Yunn School, Hong Kong SAR, China
+                </div>
+                
+                <div class="institutional-logos">
+                    <div class="logo-container">
+                        <img src="assets/polyu-logo.png" alt="The Hong Kong Polytechnic University Logo" class="institution-logo polyu-logo">
+                    </div>
+                    <div class="logo-container">
+                        <img src="assets/UCL-logo.png" alt="University College London Logo" class="institution-logo ucl-logo">
+                    </div>
+                </div>
+                <div class="conference">
+                    <a href="https://uist.acm.org/2025/" target="_blank" rel="noopener noreferrer">ACM UIST 2025</a>
+                </div>
+                <div class="theme-toggle">
+                    <button id="theme-toggle" aria-label="Toggle theme">
+                        <span id="theme-icon">🌙</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Links -->
+            <section class="links">
+                <div class="link-grid">
+                    <a href="#" class="link-item" disabled>
+                        <span class="link-icon">📄</span>
+                        <span class="link-text">Paper (Coming Soon)</span>
+                    </a>
+                    <a href="https://www.youtube.com/watch?v=IkZjoV7NA6U" class="link-item" target="_blank" rel="noopener noreferrer">
+                        <span class="link-icon">📹</span>
+                        <span class="link-text">Video</span>
+                    </a>
+                    <a href="#" class="link-item" disabled>
+                        <span class="link-icon">💻</span>
+                        <span class="link-text">Code (Coming Soon)</span>
+                    </a>
+                    <a href="#" class="link-item" disabled>
+                        <span class="link-icon">🔗</span>
+                        <span class="link-text">ACM DL (Coming Soon)</span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Trailer Image -->
+            <div class="trailer-container">
+                <img src="assets/VR-Mover-trailer.png" alt="VR Mover Trailer" class="trailer-image expandable-image" data-image-src="assets/VR-Mover-trailer.png">
+            </div>
+
+            <!-- Image Modal -->
+            <div id="image-modal" class="image-modal">
+                <div class="modal-content">
+                    <span class="close-modal">&times;</span>
+                    <img id="modal-image" src="" alt="Expanded Image">
+                </div>
+            </div>
+
+            <!-- Abstract -->
+            <section class="abstract">
+                <h2>Abstract</h2>
+                <p>In our daily lives, we naturally convey instructions for spatially manipulating objects using words and gestures. Transposing this form of interaction into virtual reality (VR) object manipulation can be beneficial. We propose VR Mover, an LLM-empowered multimodal interface that can understand and interpret the user's vocal instructions combined with gestures to support object manipulation. By simply pointing and speaking, the user can command the LLM to manipulate objects without structured input.</p>
+                
+                <p>Compared to classic interfaces, our user study demonstrates that VR Mover enhances user usability, overall experience, and performance on multi-object manipulation, while also reducing workload and arm fatigue. Users prefer the proposed natural interface for broad movements and may complementarily switch to gizmos or virtual hands for finer adjustments. These findings are believed to contribute to design implications for future LLM-based object manipulation interfaces, highlighting the potential for more intuitive and efficient user interactions in VR environments.</p>
+            </section>
+
+            <!-- Video Player -->
+            <section class="video-player">
+                <h2>Video</h2>
+                <div class="youtube-container">
+                    <iframe 
+                        width="100%" 
+                        height="400" 
+                        src="https://www.youtube.com/embed/IkZjoV7NA6U?start=3" 
+                        title="VR Mover Video" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            </section>
+
+            <!-- Method -->
+            <section class="method">
+                <h2>Method</h2>
+                
+                <div class="method-overview">
+                    <p>VR Mover addresses the challenge of real-time LLM-based object manipulation by decomposing complex tasks into atomized functions. The system consists of four key components:</p>
+                </div>
+
+                <div class="method-components">
+                    <div class="component">
+                        <h3>Scene Modeling</h3>
+                        <p>Converts 3D spatial information into text-based JSON format using oriented bounding boxes (OBBs) to represent object positions, rotations, and dimensions. Objects are categorized into environmental (static) and manipulatable (dynamic) elements, with metadata including object names and descriptions. This structured representation enables the LLM to understand spatial relationships and object properties efficiently.</p>
+                    </div>
+
+                    <div class="component">
+                        <h3>User-Centric Augmentation</h3>
+                        <p>Processes multimodal inputs including speech recognition (via Azure's cloud service), focus frames (groups of continuous viewports during speech), and gestural cues (pointing and lining gestures). A text-based time serialization scheme efficiently injects gestural cues into speech transcripts using ID tags, enabling the LLM to understand temporal relationships between speech and actions.</p>
+                    </div>
+
+                    <div class="component">
+                        <h3>LLM Processing</h3>
+                        <p>Uses GPT-4o to generate atomic API calls (CREATE, MOVE, SCALE, DELETE, etc.) instead of complex code scripts or JSON. This approach achieves an average response time of <strong>2.29 seconds</strong>, significantly faster than previous LLM-based VR systems. The atomized function approach enables real-time manipulation while maintaining accuracy.</p>
+                    </div>
+
+                    <div class="component">
+                        <h3>Scene Update</h3>
+                        <p>Parses and executes API calls asynchronously, updating the virtual environment in real-time. The module processes incoming function calls through a buffer system, allowing for frame-by-frame updates without requiring recompilation. This ensures smooth, responsive object manipulation while maintaining system stability.</p>
+                    </div>
+                </div>
+
+                <div class="method-performance">
+                    <h3>Performance</h3>
+                    <p>Evaluation across multiple LLM models (GPT-4o, Llama3.1-405B, Llama3.1-70B) shows consistent results with error rates below 2%, demonstrating the system's robustness and reproducibility for object manipulation tasks.</p>
+                </div>
+            </section>
+
+            <!-- Results -->
+            <section class="results">
+                <h2>Results</h2>
+                <div class="results-grid">
+                    <div class="result-item">
+                        <div class="result-placeholder">
+                            <span class="placeholder-icon">📊</span>
+                            <p>User Study Results</p>
+                            <span class="coming-soon">Coming Soon...</span>
+                        </div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-placeholder">
+                            <span class="placeholder-icon">📈</span>
+                            <p>Performance Metrics</p>
+                            <span class="coming-soon">Coming Soon...</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BibTeX -->
+            <section class="bibtex">
+                <h2>BibTeX</h2>
+                <div class="bibtex-code">
+                    <pre><code>@inproceedings{vrmover2025,
+  title={Can You Move These Over There? Exploring an LLM-based VR Mover to Support Natural Multi-object Manipulation},
+  author={Wang, Xiangzhi Eric and Sin, Zackary P. T. and Jia, Ye and Archer, Daniel and Fong, Wynonna H. Y. and Li, Qing and Li, Chen},
+  booktitle={Proceedings of the ACM Symposium on User Interface Software and Technology},
+  year={2025},
+  publisher={ACM},
+  doi={10.1145/XXXXXXX.XXXXXXX},
+  url={https://doi.org/10.1145/XXXXXXX.XXXXXXX}
+}</code></pre>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>This website is licensed under the <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer">Apache License, Version 2.0</a>.</p>
+            <div class="cursor-credit">
+                <span>Built with</span>
+                <a href="https://cursor.sh" target="_blank" rel="noopener noreferrer" class="cursor-link">
+                    <img src="assets/cursor-logo.webp" alt="Cursor Logo" class="cursor-logo">
+                    <span>Cursor</span>
+                </a>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
