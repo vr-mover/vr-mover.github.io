@@ -8,7 +8,7 @@ VR Mover is an innovative LLM-based multimodal interface that enables natural ob
 
 ### Key Features
 
-- **Natural Language Interaction**: Users can speak commands like "move the chair here" while pointing
+- **Natural Language Interaction**: Users can say commands like "move the chair here" while pointing
 - **Multimodal Input**: Combines speech, head motion, and controller gestures
 - **Real-time Response**: Achieves 2.29-second average response time using atomized API calls
 - **User-Centric Design**: Understands instructions from the user's perspective using focus frames
