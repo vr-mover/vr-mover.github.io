@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Sitemap location (update with your actual domain)
+Sitemap: https://vr-mover.github.io/sitemap.xml
+
+# Crawl delay (optional, helps with server load)
+Crawl-delay: 1
+

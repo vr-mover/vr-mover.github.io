@@ -3,13 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VR Mover - ACM UIST 2025</title>
-    <meta name="description" content="Can You Move These Over There? Exploring an LLM-based VR Mover to Support Natural Multi-object Manipulation">
+    
+    <!-- Primary Meta Tags -->
+    <title>VR Mover - LLM-based VR Object Manipulation | ACM UIST 2025</title>
+    <meta name="title" content="VR Mover - LLM-based VR Object Manipulation | ACM UIST 2025">
+    <meta name="description" content="VR Mover: An LLM-empowered multimodal interface for natural object manipulation in VR. Achieves 2.29s response time with speech + gesture commands. Research from The Hong Kong Polytechnic University.">
+    <meta name="keywords" content="VR Mover, virtual reality, LLM, object manipulation, multimodal interface, speech recognition, gesture control, ACM UIST 2025, Hong Kong Polytechnic University, VR research">
+    <meta name="author" content="Xiangzhi Eric Wang, Zackary P. T. Sin, Ye Jia, Daniel Archer, Wynonna H. Y. Fong, Qing Li, Chen Li">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://vr-mover.github.io/">
+    <meta property="og:title" content="VR Mover - LLM-based VR Object Manipulation | ACM UIST 2025">
+    <meta property="og:description" content="VR Mover: An LLM-empowered multimodal interface for natural object manipulation in VR. Achieves 2.29s response time with speech + gesture commands.">
+    <meta property="og:image" content="https://vr-mover.github.io/assets/VR-Mover-trailer.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="VR Mover Research">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://vr-mover.github.io/">
+    <meta property="twitter:title" content="VR Mover - LLM-based VR Object Manipulation | ACM UIST 2025">
+    <meta property="twitter:description" content="VR Mover: An LLM-empowered multimodal interface for natural object manipulation in VR. Achieves 2.29s response time with speech + gesture commands.">
+    <meta property="twitter:image" content="https://vr-mover.github.io/assets/VR-Mover-trailer.png">
+    
+    <!-- Additional SEO Meta Tags -->
+    <meta name="theme-color" content="#007bff">
+    <meta name="msapplication-TileColor" content="#007bff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="VR Mover">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://vr-mover.github.io/">
+    
+    <!-- Favicon and App Icons -->
     <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="apple-touch-icon" href="assets/favicon.svg">
+    
+    <!-- Preconnect to external domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.youtube.com">
+
+    <!-- Google Site Verification -->
+    <meta name="google-site-verification" content="tBMwtTM29JMJltzfH-AF4pw16v__II8xc0suaK6uIAY" />
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Structured Data Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "ScholarlyArticle",
+        "headline": "Can You Move These Over There? Exploring an LLM-based VR Mover to Support Natural Multi-object Manipulation",
+        "description": "VR Mover: An LLM-empowered multimodal interface for natural object manipulation in VR environments using speech recognition and gestural cues.",
+        "image": "https://vr-mover.github.io/assets/VR-Mover-trailer.png",
+        "author": [
+            {
+                "@type": "Person",
+                "name": "Xiangzhi Eric Wang",
+                "affiliation": {
+                    "@type": "Organization",
+                    "name": "The Hong Kong Polytechnic University"
+                },
+                "sameAs": "https://orcid.org/0009-0001-4772-7210"
+            },
+            {
+                "@type": "Person",
+                "name": "Zackary P. T. Sin",
+                "affiliation": {
+                    "@type": "Organization",
+                    "name": "The Hong Kong Polytechnic University"
+                },
+                "sameAs": "https://orcid.org/0000-0002-8377-0216"
+            },
+            {
+                "@type": "Person",
+                "name": "Ye Jia",
+                "affiliation": {
+                    "@type": "Organization",
+                    "name": "The Hong Kong Polytechnic University"
+                },
+                "sameAs": "https://orcid.org/0000-0002-0457-8083"
+            },
+            {
+                "@type": "Person",
+                "name": "Daniel Archer",
+                "affiliation": {
+                    "@type": "Organization",
+                    "name": "University College London"
+                },
+                "sameAs": "https://orcid.org/0000-0002-2525-8054"
+            },
+            {
+                "@type": "Person",
+                "name": "Wynonna H. Y. Fong",
+                "affiliation": {
+                    "@type": "Organization",
+                    "name": "Heep Yunn School"
+                },
+                "sameAs": "https://orcid.org/0009-0007-6625-4993"
+            },
+            {
+                "@type": "Person",
+                "name": "Qing Li",
+                "affiliation": {
+                    "@type": "Organization",
+                    "name": "The Hong Kong Polytechnic University"
+                },
+                "sameAs": "https://orcid.org/0000-0003-3370-471X"
+            },
+            {
+                "@type": "Person",
+                "name": "Chen Li",
+                "affiliation": {
+                    "@type": "Organization",
+                    "name": "The Hong Kong Polytechnic University"
+                },
+                "sameAs": "https://orcid.org/0000-0002-3782-0737"
+            }
+        ],
+        "publisher": {
+            "@type": "Organization",
+            "name": "ACM",
+            "url": "https://www.acm.org/"
+        },
+        "datePublished": "2025",
+        "dateModified": "2025",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://vr-mover.github.io/"
+        },
+        "about": [
+            "Virtual Reality",
+            "LLM",
+            "Object Manipulation",
+            "Multimodal Interface",
+            "Speech Recognition",
+            "Gesture Control",
+            "Human-Computer Interaction"
+        ],
+        "keywords": "VR Mover, virtual reality, LLM, object manipulation, multimodal interface, speech recognition, gesture control, ACM UIST 2025",
+        "inLanguage": "en",
+        "isPartOf": {
+            "@type": "CreativeWork",
+            "name": "ACM UIST 2025",
+            "url": "https://uist.acm.org/2025/"
+        }
+    }
+    </script>
 </head>
 <body>
     <div class="container">
@@ -97,11 +247,13 @@
             </div>
 
             <!-- Abstract -->
-            <section class="abstract">
+            <section class="abstract" id="abstract">
                 <h2>Abstract</h2>
-                <p>In our daily lives, we naturally convey instructions for spatially manipulating objects using words and gestures. Transposing this form of interaction into virtual reality (VR) object manipulation can be beneficial. We propose VR Mover, an LLM-empowered multimodal interface that can understand and interpret the user's vocal instructions combined with gestures to support object manipulation. By simply pointing and speaking, the user can command the LLM to manipulate objects without structured input.</p>
-                
-                <p>Compared to classic interfaces, our user study demonstrates that VR Mover enhances user usability, overall experience, and performance on multi-object manipulation, while also reducing workload and arm fatigue. Users prefer the proposed natural interface for broad movements and may complementarily switch to gizmos or virtual hands for finer adjustments. These findings are believed to contribute to design implications for future LLM-based object manipulation interfaces, highlighting the potential for more intuitive and efficient user interactions in VR environments.</p>
+                <article>
+                    <p>In our daily lives, we naturally convey instructions for spatially manipulating objects using words and gestures. Transposing this form of interaction into virtual reality (VR) object manipulation can be beneficial. We propose <strong>VR Mover</strong>, an LLM-empowered multimodal interface that can understand and interpret the user's vocal instructions combined with gestures to support object manipulation. By simply pointing and speaking, the user can command the LLM to manipulate objects without structured input.</p>
+                    
+                    <p>Compared to classic interfaces, our user study demonstrates that VR Mover enhances user usability, overall experience, and performance on multi-object manipulation, while also reducing workload and arm fatigue. Users prefer the proposed natural interface for broad movements and may complementarily switch to gizmos or virtual hands for finer adjustments. These findings are believed to contribute to design implications for future LLM-based object manipulation interfaces, highlighting the potential for more intuitive and efficient user interactions in VR environments.</p>
+                </article>
             </section>
 
             <!-- Video Player -->
@@ -111,7 +263,7 @@
                     <iframe 
                         width="100%" 
                         height="400" 
-                        src="https://www.youtube.com/embed/IkZjoV7NA6U?start=3" 
+                        src="https://www.youtube.com/embed/IkZjoV7NA6U?start=3&modestbranding=1&rel=0&controls=1&iv_load_policy=3&cc_load_policy=0&fs=1&autohide=1&color=white&theme=light" 
                         title="VR Mover Video" 
                         frameborder="0" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
@@ -121,7 +273,7 @@
             </section>
 
             <!-- Method -->
-            <section class="method">
+            <section class="method" id="method">
                 <h2>Method</h2>
                 
                 <div class="method-overview">
@@ -157,7 +309,7 @@
             </section>
 
             <!-- Results -->
-            <section class="results">
+            <section class="results" id="results">
                 <h2>Results</h2>
                 <div class="results-grid">
                     <div class="result-item">
@@ -178,7 +330,7 @@
             </section>
 
             <!-- BibTeX -->
-            <section class="bibtex">
+            <section class="bibtex" id="bibtex">
                 <h2>BibTeX</h2>
                 <div class="bibtex-code">
                     <pre><code>@inproceedings{vrmover2025,
