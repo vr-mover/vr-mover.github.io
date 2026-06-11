@@ -214,9 +214,9 @@
             <!-- Links -->
             <section class="links">
                 <div class="link-grid">
-                    <a href="#" class="link-item" disabled>
+                    <a href="https://dl.acm.org/doi/epdf/10.1145/3746059.3747673" class="link-item" target="_blank" rel="noopener noreferrer">
                         <span class="link-icon">📄</span>
-                        <span class="link-text">Paper (Coming Soon)</span>
+                        <span class="link-text">Paper</span>
                     </a>
                     <a href="https://www.youtube.com/watch?v=IkZjoV7NA6U" class="link-item" target="_blank" rel="noopener noreferrer">
                         <span class="link-icon">📹</span>
@@ -226,17 +226,18 @@
                         <span class="link-icon">💻</span>
                         <span class="link-text">Code (Coming Soon)</span>
                     </a>
-                    <a href="#" class="link-item" disabled>
+                    <a href="https://dl.acm.org/doi/10.1145/3746059.3747673" class="link-item" target="_blank" rel="noopener noreferrer">
                         <span class="link-icon">🔗</span>
-                        <span class="link-text">ACM DL (Coming Soon)</span>
+                        <span class="link-text">ACM DL</span>
                     </a>
                 </div>
             </section>
 
             <!-- Trailer Image -->
-            <div class="trailer-container">
+            <figure class="trailer-container">
                 <img src="assets/VR-Mover-trailer.png" alt="VR Mover Trailer" class="trailer-image expandable-image" data-image-src="assets/VR-Mover-trailer.png">
-            </div>
+                <figcaption class="trailer-caption">VR Mover aggregates user-centric information — what the user is saying, seeing, and pointing at — and generates atomic API calls (e.g. <code>CREATE</code>, <code>MOVE</code>, <code>LOOKAT</code>) to assist with object placement.</figcaption>
+            </figure>
 
             <!-- Image Modal -->
             <div id="image-modal" class="image-modal">
@@ -272,6 +273,52 @@
                 </div>
             </section>
 
+            <!-- Interaction -->
+            <section class="interaction" id="interaction">
+                <h2>Interacting with VR Mover</h2>
+                <p class="section-lead">Just like instructing a real-life mover, the user combines natural speech with simple gestures — no structured commands, no menus, no grammar to memorise.</p>
+
+                <div class="feature-block">
+                    <div class="feature-text">
+                        <h3>Pointing</h3>
+                        <p>Point at an object and then at its destination: <em>"Move this [point] to here [point]"</em>. Since VR Mover knows what the user is seeing, objects can also be referred to by speech alone. Complex instructions are handled in a single utterance — e.g. moving three chairs to three different spots while making them face the table.</p>
+                    </div>
+                    <img src="assets/interaction-pointing.jpg" alt="Pointing interaction: moving a cactus by pointing, and a complex multi-chair instruction" class="feature-image expandable-image" data-image-src="assets/interaction-pointing.jpg">
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>Lining</h3>
+                        <p>Drawing a line expresses direction and magnitude — <em>"Move the object that way [line]"</em> — or indicates where a row of objects should roughly go: <em>"I want 4 pictures along the wall here [line]"</em>.</p>
+                        <img src="assets/interaction-lining.jpg" alt="Lining interaction: a line representing a moving vector and a line indicating picture placement" class="feature-image expandable-image" data-image-src="assets/interaction-lining.jpg">
+                    </div>
+                    <div class="feature-card">
+                        <h3>Intelligent Responses</h3>
+                        <p>Powered by an LLM, VR Mover has spatial common sense (chairs should face the table), is context-aware (<em>"move it back"</em>), and adapts to requests like undo — even though there is no undo function.</p>
+                        <img src="assets/interaction-intelligent.jpg" alt="Intelligent responses: spatial common sense, context awareness, and adaptive undo" class="feature-image expandable-image" data-image-src="assets/interaction-intelligent.jpg">
+                    </div>
+                </div>
+
+                <div class="capability-grid">
+                    <div class="capability-item">
+                        <h4>User-centric</h4>
+                        <p>Understands instructions from the user's perspective — <em>"move the chair away from me"</em>.</p>
+                    </div>
+                    <div class="capability-item">
+                        <h4>Asynchronous Multi-object</h4>
+                        <p>Refer to several objects at once and apply a different manipulation to each of them.</p>
+                    </div>
+                    <div class="capability-item">
+                        <h4>Compound Instruction</h4>
+                        <p>Stack requests together — <em>"move the chair to here and then make it face the window"</em>.</p>
+                    </div>
+                    <div class="capability-item">
+                        <h4>Coarse-to-fine</h4>
+                        <p>VR Mover handles broad placement; gizmos and virtual hand remain available for fine-tuning.</p>
+                    </div>
+                </div>
+            </section>
+
             <!-- Method -->
             <section class="method" id="method">
                 <h2>Method</h2>
@@ -280,20 +327,28 @@
                     <p>VR Mover addresses the challenge of real-time LLM-based object manipulation by decomposing complex tasks into atomized functions. The system consists of four key components:</p>
                 </div>
 
+                <figure class="paper-figure">
+                    <img src="assets/method-system-overview.jpg" alt="System overview of VR Mover with four modules: scene modelling, user-centric augmentation, LLM processing, and scene update" class="expandable-image" data-image-src="assets/method-system-overview.jpg">
+                    <figcaption>The system overview of VR Mover with its four major modules. GPT-4o is used as the LLM's core.</figcaption>
+                </figure>
+
                 <div class="method-components">
                     <div class="component">
                         <h3>Scene Modeling</h3>
                         <p>Converts 3D spatial information into text-based JSON format using oriented bounding boxes (OBBs) to represent object positions, rotations, and dimensions. Objects are categorized into environmental (static) and manipulatable (dynamic) elements, with metadata including object names and descriptions. This structured representation enables the LLM to understand spatial relationships and object properties efficiently.</p>
+                        <img src="assets/method-scene-modelling.jpg" alt="JSON expression of manipulatable prefabs, manipulatable objects, and environmental objects" class="component-image expandable-image" data-image-src="assets/method-scene-modelling.jpg">
                     </div>
 
                     <div class="component">
                         <h3>User-Centric Augmentation</h3>
                         <p>Processes multimodal inputs including speech recognition (via Azure's cloud service), focus frames (groups of continuous viewports during speech), and gestural cues (pointing and lining gestures). A text-based time serialization scheme efficiently injects gestural cues into speech transcripts using ID tags, enabling the LLM to understand temporal relationships between speech and actions.</p>
+                        <img src="assets/method-user-centric.jpg" alt="User-centric augmentation module with gestural cues injected into the speech transcript" class="component-image expandable-image" data-image-src="assets/method-user-centric.jpg">
                     </div>
 
                     <div class="component">
                         <h3>LLM Processing</h3>
                         <p>Uses GPT-4o to generate atomic API calls (CREATE, MOVE, SCALE, DELETE, etc.) instead of complex code scripts or JSON. This approach achieves an average response time of <strong>2.29 seconds</strong>, significantly faster than previous LLM-based VR systems. The atomized function approach enables real-time manipulation while maintaining accuracy.</p>
+                        <img src="assets/method-llm-module.jpg" alt="LLM processing module with context window and streaming output" class="component-image expandable-image" data-image-src="assets/method-llm-module.jpg">
                     </div>
 
                     <div class="component">
@@ -304,29 +359,274 @@
 
                 <div class="method-performance">
                     <h3>Performance</h3>
-                    <p>Evaluation across multiple LLM models (GPT-4o, Llama3.1-405B, Llama3.1-70B) shows consistent results with error rates below 2%, demonstrating the system's robustness and reproducibility for object manipulation tasks.</p>
+                    <p>Evaluation across multiple LLM models shows robust behavior for object manipulation tasks: GPT‑4o yielded <strong>0% API errors</strong> in the user study, while offline evaluation with Llama3.1 models showed <strong>&lt; 2%</strong> API errors.</p>
+                    <figure class="paper-figure">
+                        <img src="assets/method-llm-evaluation.jpg" alt="VR Mover's response time, error rate, and placement examples across GPT-4o, Llama3.1-405B, and Llama3.1-70B" class="expandable-image" data-image-src="assets/method-llm-evaluation.jpg">
+                        <figcaption>VR Mover's (a) response time, (b) error rate and (c) placement examples given different LLM models.</figcaption>
+                    </figure>
                 </div>
             </section>
 
             <!-- Results -->
             <section class="results" id="results">
                 <h2>Results</h2>
-                <div class="results-grid">
-                    <div class="result-item">
-                        <div class="result-placeholder">
-                            <span class="placeholder-icon">📊</span>
-                            <p>User Study Results</p>
-                            <span class="coming-soon">Coming Soon...</span>
+                <div class="results-intro">
+                    <p>Our user study with 24 participants compared VR Mover against Control (gizmos + virtual hand) and Voice Command (rule-based) interfaces across single and multi-object manipulation tasks.</p>
+                </div>
+                
+                <div class="results-highlights">
+                    <div class="highlight-card primary">
+                        <div class="highlight-icon">⚡</div>
+                        <div class="highlight-content">
+                            <h3>Multi-object Performance</h3>
+                            <div class="highlight-metric">
+                                <span class="metric-value">2.4×</span>
+                                <span class="metric-label">faster than Control</span>
+                            </div>
+                            <div class="highlight-metric">
+                                <span class="metric-value">1.7×</span>
+                                <span class="metric-label">faster than Voice Command</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="result-item">
-                        <div class="result-placeholder">
-                            <span class="placeholder-icon">📈</span>
-                            <p>Performance Metrics</p>
-                            <span class="coming-soon">Coming Soon...</span>
+                    
+                    <div class="highlight-card success">
+                        <div class="highlight-icon">💪</div>
+                        <div class="highlight-content">
+                            <h3>Reduced Fatigue</h3>
+                            <div class="highlight-metric">
+                                <span class="metric-value">47%</span>
+                                <span class="metric-label">less arm fatigue vs Control</span>
+                            </div>
+                            <div class="highlight-metric">
+                                <span class="metric-value">28%</span>
+                                <span class="metric-label">less than Voice Command</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="highlight-card info">
+                        <div class="highlight-icon">📊</div>
+                        <div class="highlight-content">
+                            <h3>Lower Workload</h3>
+                            <div class="highlight-metric">
+                                <span class="metric-value">35%</span>
+                                <span class="metric-label">reduction in NASA-TLX vs Control</span>
+                            </div>
+                            <div class="highlight-metric">
+                                <span class="metric-value">18%</span>
+                                <span class="metric-label">reduction vs Voice Command</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="highlight-card warning">
+                        <div class="highlight-icon">👥</div>
+                        <div class="highlight-content">
+                            <h3>User Preference</h3>
+                            <div class="highlight-metric">
+                                <span class="metric-value">63%</span>
+                                <span class="metric-label">first choice for Task 1</span>
+                            </div>
+                            <div class="highlight-metric">
+                                <span class="metric-value">71%</span>
+                                <span class="metric-label">first choice for Task 2</span>
+                            </div>
                         </div>
                     </div>
                 </div>
+                
+                <div class="results-performance">
+                    <h3>Task Performance Details</h3>
+                    <div class="performance-grid">
+                        <div class="performance-card">
+                            <div class="performance-header">
+                                <h4>Task 1A: Single Mid-air</h4>
+                                <span class="performance-tag">Single Object</span>
+                            </div>
+                            <div class="performance-content">
+                                <p>Similar performance to Control interface, significantly faster than rule-based Voice Command</p>
+                            </div>
+                        </div>
+                        
+                        <div class="performance-card">
+                            <div class="performance-header">
+                                <h4>Task 1B: Multi-object</h4>
+                                <span class="performance-tag">Multiple Objects</span>
+                            </div>
+                            <div class="performance-content">
+                                <div class="performance-metrics">
+                                    <div class="metric-row">
+                                        <span class="metric-label">Coarse:</span>
+                                        <span class="metric-value">29.9s</span>
+                                        <span class="metric-comparison">vs 72.1s (Control), 50.5s (Voice)</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">Fine:</span>
+                                        <span class="metric-value">52.6s</span>
+                                        <span class="metric-comparison">vs 78.5s (Control), 70.0s (Voice)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="performance-card">
+                            <div class="performance-header">
+                                <h4>Hand Movement</h4>
+                                <span class="performance-tag">Task 1B</span>
+                            </div>
+                            <div class="performance-content">
+                                <div class="performance-metrics">
+                                    <div class="metric-row">
+                                        <span class="metric-value">3.6m</span>
+                                        <span class="metric-comparison">vs 7.5m (Control), 5.1m (Voice)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="performance-card">
+                            <div class="performance-header">
+                                <h4>User Experience</h4>
+                                <span class="performance-tag">Overall</span>
+                            </div>
+                            <div class="performance-content">
+                                <div class="performance-metrics">
+                                    <div class="metric-row">
+                                        <span class="metric-label">SUS:</span>
+                                        <span class="metric-value">3.90</span>
+                                        <span class="metric-comparison">vs 3.17 (Control)</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">UEQ-S:</span>
+                                        <span class="metric-value">5.73</span>
+                                        <span class="metric-comparison">vs 3.92 (Control)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="results-charts">
+                    <h3>User Study Charts</h3>
+                    <div class="chart-grid">
+                        <div class="chart-item">
+                            <img src="assets/results-task1-times.jpg" alt="Task 1A/1B coarse and fine manipulation times and hand movement distance" class="chart-image expandable-image" data-image-src="assets/results-task1-times.jpg">
+                            <p class="chart-caption">Task 1A/1B coarse and fine manipulation times, and hand movement distance</p>
+                        </div>
+                        <div class="chart-item">
+                            <img src="assets/results-borg-sus-pq.jpg" alt="Borg C10, SUS, and Presence scores" class="chart-image expandable-image" data-image-src="assets/results-borg-sus-pq.jpg">
+                            <p class="chart-caption">Borg C10 (arm fatigue), SUS (usability), and Presence (PQ)</p>
+                        </div>
+                        <div class="chart-item">
+                            <img src="assets/results-nasa-tlx.jpg" alt="NASA-TLX workload scores and subscales" class="chart-image expandable-image" data-image-src="assets/results-nasa-tlx.jpg">
+                            <p class="chart-caption">NASA-TLX workload scores and subscales</p>
+                        </div>
+                        <div class="chart-item">
+                            <img src="assets/results-ueq-ranking.jpg" alt="UEQ-S user experience scores and preference ranking" class="chart-image expandable-image" data-image-src="assets/results-ueq-ranking.jpg">
+                            <p class="chart-caption">UEQ-S (overall, pragmatic, hedonic) and preference ranking for Task 1 and Task 2</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- User Study -->
+            <section class="user-study" id="user-study">
+                <h2>User Study</h2>
+                <p class="section-lead">24 participants (ages 18–35) tried all three interfaces in randomized order on a Meta Quest 3, completing performance and creative tasks followed by questionnaires and an interview (~2 hours per session).</p>
+
+                <div class="study-block">
+                    <h3>Compared Interfaces</h3>
+                    <figure class="paper-figure">
+                        <img src="assets/study-interfaces.jpg" alt="The gizmos, virtual hand, and rule-based voice command interfaces" class="expandable-image" data-image-src="assets/study-interfaces.jpg">
+                        <figcaption><strong>Control</strong> — gizmos + virtual hand, the classic approach; <strong>Voice Command</strong> — an LLM-removed, rule-based variant limited to predefined commands like <em>"move this here"</em>; <strong>VR Mover</strong> — our LLM-based interface. All three include gizmos and virtual hand for fine-tuning.</figcaption>
+                    </figure>
+                </div>
+
+                <div class="study-block">
+                    <h3>Tasks</h3>
+                    <div class="task-grid">
+                        <div class="task-card">
+                            <img src="assets/study-task1a.jpg" alt="Task 1A environment: a chair and a mid-air target" class="task-image expandable-image" data-image-src="assets/study-task1a.jpg">
+                            <h4>Task 1A — Single Mid-air</h4>
+                            <p>Move one object to a semi-transparent mid-air target.</p>
+                        </div>
+                        <div class="task-card">
+                            <img src="assets/study-task1b.jpg" alt="Task 1B environment: multiple objects and ground targets" class="task-image expandable-image" data-image-src="assets/study-task1b.jpg">
+                            <h4>Task 1B — Multi-object</h4>
+                            <p>Move several objects to their respective ground targets.</p>
+                        </div>
+                        <div class="task-card">
+                            <img src="assets/study-task2-room.jpg" alt="Task 2: empty sandbox room" class="task-image expandable-image" data-image-src="assets/study-task2-room.jpg">
+                            <h4>Task 2 — Sandbox Room</h4>
+                            <p>Freely furnish an empty room for 7 minutes using a prefab menu.</p>
+                        </div>
+                        <div class="task-card">
+                            <img src="assets/study-task2-miniroom.jpg" alt="Task 2 reference mini-room" class="task-image expandable-image" data-image-src="assets/study-task2-miniroom.jpg">
+                            <h4>Task 2 — Reference</h4>
+                            <p>A mini-room shown in VR serves as the soft goal to replicate.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="study-block">
+                    <h3>Measures</h3>
+                    <div class="measure-chips">
+                        <span class="chip">Coarse / fine manipulation time</span>
+                        <span class="chip">Hand movement distance</span>
+                        <span class="chip">Arm fatigue (Borg C10)</span>
+                        <span class="chip">Workload (NASA-TLX)</span>
+                        <span class="chip">Usability (SUS)</span>
+                        <span class="chip">User experience (UEQ-S)</span>
+                        <span class="chip">Presence (PQ)</span>
+                        <span class="chip">Preference ranking</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Design Recommendations -->
+            <section class="design-recommendations" id="design-recommendations">
+                <h2>Design Recommendations</h2>
+                <p class="section-lead">From our implementation and study findings, we derived six design implications for future LLM-based VR interfaces.</p>
+
+                <div class="implication-grid">
+                    <div class="implication-item">
+                        <span class="implication-tag">D1</span>
+                        <h4>Leverage both LLM and classic interfaces</h4>
+                        <p>Mix the LLM interface with classic controls for fine-tuning, with seamless switching between the two.</p>
+                    </div>
+                    <div class="implication-item">
+                        <span class="implication-tag">D2</span>
+                        <h4>Prioritise coarse placement</h4>
+                        <p>Users care most about getting objects roughly where they want them — optimise coarse control first.</p>
+                    </div>
+                    <div class="implication-item">
+                        <span class="implication-tag">D3</span>
+                        <h4>Focus on asynchronous multi-object interaction</h4>
+                        <p>The LLM's main strength is applying different manipulations to multiple objects in one request.</p>
+                    </div>
+                    <div class="implication-item">
+                        <span class="implication-tag">D4</span>
+                        <h4>Develop an optimal set of atomic functions</h4>
+                        <p>Atomized functions cut errors and response time dramatically compared to code or JSON generation.</p>
+                    </div>
+                    <div class="implication-item">
+                        <span class="implication-tag">D5</span>
+                        <h4>Interaction discovery and tuning</h4>
+                        <p>New interactions can be "taught" to the LLM with a single prompt exemplar — no reprogramming needed.</p>
+                    </div>
+                    <div class="implication-item">
+                        <span class="implication-tag">D6</span>
+                        <h4>Mimic real-world behaviour</h4>
+                        <p>Replicating how people naturally convey spatial instructions reduces the learning curve in VR.</p>
+                    </div>
+                </div>
+
+                <figure class="paper-figure">
+                    <img src="assets/explorative-interactions.jpg" alt="Explorative interactions: asynchronous multi-object undo, repeated transform, and area-drawing" class="expandable-image" data-image-src="assets/explorative-interactions.jpg">
+                    <figcaption>Explorative interactions built on these implications: (a) asynchronous multi-object undo, (b) repeated transform, and (c) area-drawing — plus filtered selection, e.g. <em>"I only want the yellow flowers in this area to be larger."</em></figcaption>
+                </figure>
             </section>
 
             <!-- BibTeX -->
@@ -339,8 +639,8 @@
   booktitle={Proceedings of the ACM Symposium on User Interface Software and Technology},
   year={2025},
   publisher={ACM},
-  doi={10.1145/XXXXXXX.XXXXXXX},
-  url={https://doi.org/10.1145/XXXXXXX.XXXXXXX}
+  doi={10.1145/3746059.3747673},
+  url={https://doi.org/10.1145/3746059.3747673}
 }</code></pre>
                 </div>
             </section>
