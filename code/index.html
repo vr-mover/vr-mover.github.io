@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VR Mover · Source Code</title>
+  <meta name="description" content="Single-file JavaScript reproduction of the VR Mover core pipeline, with the original system prompts used in the paper.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" id="hljs-dark" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <link rel="stylesheet" id="hljs-light" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" disabled>
+  <link rel="stylesheet" href="../js/code.css?v=2">
+  <!-- Apply saved/system theme before first paint (shares 'theme' with the project page). -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme')
+        || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<body>
+
+<header id="header">
+  <a class="logo" href="../index.html">
+    <img src="../assets/vr-mover-logo-wo-text.svg" alt="VR Mover logo">
+    VR Mover <span class="page-name">· Source Code</span>
+  </a>
+  <div class="spacer"></div>
+  <button class="hbtn hbtn-icon" id="theme-toggle" title="Toggle light / dark"><span id="theme-icon">🌙</span></button>
+  <a class="hbtn" href="../demo3d.html">Interactive Demo</a>
+  <a class="hbtn" href="../index.html">← Paper</a>
+</header>
+
+<div id="page">
+
+  <!-- Notice 1: why a JavaScript reproduction -->
+  <div class="notice blue">
+    <div class="n-icon">ℹ️</div>
+    <div>
+      <h3>Why a JavaScript reproduction?</h3>
+      <p>
+        The original VR Mover project runs on <strong>Unity + Oculus VR headsets</strong>, which makes it
+        complicated to duplicate, run, and maintain — it requires a full Unity setup, VR hardware, and several
+        paid service subscriptions. We therefore re-produced the key functionality
+        (LLM streaming, API-call extraction, conversation context, operating rounds, speech-to-text and timing)
+        in a <strong>single, well-documented JavaScript file</strong> with zero dependencies.
+        This makes the method easy to reproduce and extend for other use cases — and because everything lives
+        in one self-contained file, you can hand it to an AI coding agent and have it transformed into
+        any other programming language with minimal effort.
+      </p>
+    </div>
+  </div>
+
+  <!-- Notice 2: STT word timing / Azure SDK -->
+  <div class="notice yellow">
+    <div class="n-icon">🎙️</div>
+    <div>
+      <h3>Speech-to-text and word-level timing</h3>
+      <p>
+        VR Mover relies on the <strong>exact timing of each recognized word</strong> to align spoken commands
+        with pointing gestures (e.g. matching "put it <em>here</em>" with the moment the user pointed).
+        The browser's free Web Speech API used in this reproduction does not expose per-word timestamps, so
+        timing here is best-effort. The original project uses the
+        <a href="https://learn.microsoft.com/en-us/azure/ai-services/speech-service/index-speech-to-text"
+           target="_blank" rel="noopener noreferrer">Azure Speech SDK</a>, which provides precise word-level
+        offsets (<code>Offset</code> / <code>Duration</code> per word) — refer to the Azure documentation for
+        detailed usage in your language of choice. The same capability exists in most other commercial STT SDKs
+        (Google Cloud Speech, AWS Transcribe, Whisper with timestamps, etc.), so the approach ports directly.
+      </p>
+    </div>
+  </div>
+
+  <div id="main">
+    <!-- File list -->
+    <nav id="files" aria-label="Source files">
+      <div class="files-head">Files</div>
+      <div id="file-list"></div>
+    </nav>
+
+    <!-- Viewer -->
+    <section id="viewer">
+      <div id="viewer-head">
+        <span id="viewer-title">—</span>
+        <span id="viewer-desc"></span>
+        <div class="view-mode" id="view-mode" hidden title="Render mode">
+          <button class="vm-btn active" id="vm-md" data-mode="markdown">Markdown</button>
+          <button class="vm-btn" id="vm-plain" data-mode="plain">Plain text</button>
+        </div>
+        <button class="vbtn" id="btn-copy" title="Copy file contents">⧉ Copy</button>
+        <button class="vbtn" id="btn-download" title="Download raw file">⬇ Download raw</button>
+      </div>
+      <div id="code-wrap">
+        <div id="line-nums"></div>
+        <pre id="code-pre"><code id="code-el"></code></pre>
+      </div>
+      <div id="md-wrap" class="md-body" hidden></div>
+      <div id="loading" hidden>Loading…</div>
+    </section>
+  </div>
+
+  <footer id="footer">
+    VR Mover — ACM UIST 2025 · <a href="../index.html">Project page</a> · <a href="../demo3d.html">Interactive demo</a>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script src="../js/code.js?v=2"></script>
+</body>
+</html>

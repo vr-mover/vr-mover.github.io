@@ -1,0 +1,118 @@
+{
+  "player": {
+    "position": {
+      "x": "0.10",
+      "y": "1.15",
+      "z": "-0.18"
+    },
+    "forward": {
+      "x": "0.74",
+      "y": "0.03",
+      "z": "0.67"
+    },
+    "right": {
+      "x": "0.67",
+      "y": "0.01",
+      "z": "-0.74"
+    }
+  },
+  "objects": [
+    {
+      "object_id": "-000000",
+      "object_name": "PromptCouch",
+      "position": {
+        "x": "8.50",
+        "y": "0.05",
+        "z": "6.00"
+      },
+      "scale": {
+        "x": "1.00",
+        "y": "1.00",
+        "z": "1.00"
+      },
+      "boundary": {
+        "Central": {
+          "x": "8.50",
+          "y": "0.60",
+          "z": "6.00"
+        },
+        "Size": {
+          "x": "2.67",
+          "y": "1.14",
+          "z": "0.98"
+        },
+        "Forward": {
+          "x": "0.00",
+          "y": "0.00",
+          "z": "-1.00"
+        },
+        "Up": {
+          "x": "0.00",
+          "y": "1.00",
+          "z": "0.00"
+        },
+        "Right": {
+          "x": "-1.00",
+          "y": "0.00",
+          "z": "0.00"
+        }
+      }
+    }
+  ],
+  "head_stay_frames": [
+    {
+      "Stay Duration": 20.2802734,
+      "In Frustum Objects ID": [
+        {
+          "Object": "-000000",
+          "Weight": 100
+        }
+      ],
+      "In Frustum Environment Objects ID": [
+        {
+          "Object": "PromptCorner1",
+          "Weight": 110
+        },
+        {
+          "Object": "PromptWindow",
+          "Weight": 100
+        },
+        {
+          "Object": "PromptWallZNegative",
+          "Weight": 90
+        },
+        {
+          "Object": "PromptCorner2",
+          "Weight": 70
+        },
+        {
+          "Object": "PromptWallXNegative",
+          "Weight": 50
+        }
+      ]
+    }
+  ],
+  "hit_points": {
+    "points": [
+      {
+        "hit_id": "h-1",
+        "object": "PromptWallXNegative",
+        "position": {
+          "x": "9.94",
+          "y": "1.40",
+          "z": "6.18"
+        },
+        "normal": {
+          "x": "-1.00",
+          "y": "0.00",
+          "z": "0.00"
+        }
+      }
+    ]
+  },
+  "drawing_lines": [],
+  "user_request": "I want an example environment at this promptcorner, and put a promptbookshelf here. You can move the promptcouch ahead to leave space to the promptbookshelf please.",
+  "user_request_with_actions_inserted": "I want a example environment at this promptcorner and put a promptbookshelf here [<h-1>] please you can move the promptcouch ahead to leave space to the promptbookshelf please",
+  "enabled_actions": "All the APIs are available",
+  "step_explain": "Debugging enabled, call EXPLAIN(string message); before each API call!"
+}

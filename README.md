@@ -1,6 +1,8 @@
 # VR Mover - ACM UIST 2025
 
-Official website for the paper "Can You Move These Over There? Exploring an LLM-based VR Mover to Support Natural Multi-object Manipulation" accepted at ACM UIST 2025.
+Official website for the paper "Can You Move These Over There? Exploring an LLM-based VR Mover to Support Natural Multi-object Manipulation" published at ACM UIST 2025.
+
+🌐 **Live site:** [vr-mover.github.io](https://vr-mover.github.io/) · 🎮 **Interactive demo:** [vr-mover.github.io/demo3d.html](https://vr-mover.github.io/demo3d.html) · 📄 **Paper (ACM DL):** [10.1145/3746059.3747673](https://dl.acm.org/doi/10.1145/3746059.3747673)
 
 ## 📖 About VR Mover
 
@@ -54,18 +56,40 @@ This website showcases the VR Mover project with:
 - **Conference**: ACM Symposium on User Interface Software and Technology (UIST) 2025
 - **Authors**: Xiangzhi Eric Wang, Zackary P. T. Sin, Ye Jia, Daniel Archer, Wynonna H. Y. Fong, Qing Li, Chen Li
 - **Institutions**: The Hong Kong Polytechnic University, University College London, Heep Yunn School
-- **DOI**: Coming Soon
+- **DOI**: [10.1145/3746059.3747673](https://doi.org/10.1145/3746059.3747673)
 
 ## 🎥 Media
 
-- **Video Demo**: Available on YouTube
-- **Paper**: Coming Soon
-- **Code**: Coming Soon
-- **ACM Digital Library**: Coming Soon
+- **Video Demo**: [YouTube](https://www.youtube.com/watch?v=IkZjoV7NA6U)
+- **Paper**: [ACM Digital Library](https://dl.acm.org/doi/10.1145/3746059.3747673) (DOI [10.1145/3746059.3747673](https://doi.org/10.1145/3746059.3747673))
+- **Interactive Demo**: [3D](https://vr-mover.github.io/demo3d.html) · [2D top-down](https://vr-mover.github.io/demo.html)
+- **Code**: [Source viewer](https://vr-mover.github.io/code/) · the JS reproduction of the pipeline lives in [`js/vr-mover.js`](js/vr-mover.js)
 
 ## 📄 License
 
-This project is licensed under the Apache License, Version 2.0 - see the [LICENSE.md](LICENSE.md) file for details.
+This project is licensed under the Apache License, Version 2.0 - see the [LICENSE](LICENSE) file for details.
+
+Third-party assets: the 3D furniture models in `assets/models3d/` are from the [Kenney Furniture Kit](https://kenney.nl/assets/furniture-kit) (CC0, see `assets/models3d/LICENSE-kenney.txt`). The demos load Three.js (MIT), highlight.js (BSD-3-Clause), Marked (MIT), and the Inter font (OFL-1.1) from CDNs.
+
+## 📝 Citation
+
+```bibtex
+@inproceedings{wang2025vrmover,
+  author    = {Wang, Xiangzhi Eric and Sin, Zackary P. T. and Jia, Ye and Archer, Dan and Fong, Wynonna H. Y. and Li, Qing and Li, Chen},
+  title     = {Can You Move These Over There? Exploring an LLM-based VR Mover to Support Natural Multi-object Manipulation},
+  booktitle = {Proceedings of the 38th Annual ACM Symposium on User Interface Software and Technology},
+  series    = {UIST '25},
+  articleno = {185},
+  numpages  = {18},
+  year      = {2025},
+  publisher = {Association for Computing Machinery},
+  address   = {New York, NY, USA},
+  isbn      = {9798400720376},
+  doi       = {10.1145/3746059.3747673},
+  url       = {https://doi.org/10.1145/3746059.3747673},
+  keywords  = {LLM, Object Manipulation, VR Mover, Natural User Interface}
+}
+```
 
 ## 🤝 Contact
 
@@ -73,4 +97,4 @@ For questions about the research or technical details, please contact the resear
 
 ---
 
-**Note**: This website serves as the official landing page for the VR Mover project. Content will be updated as conference materials become available.
+**Note**: This website serves as the official landing page for the VR Mover project, presented at ACM UIST 2025.

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0d1117">
+  <title>VR Mover · Interactive 3D Demo</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="js/demo.css?v=17">
+  <link rel="stylesheet" href="js/demo3d.css?v=12">
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme')
+        || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- Header -->
+  <header id="header">
+    <a class="logo" href="index.html">
+      <img src="assets/vr-mover-logo-wo-text.svg" alt="VR Mover logo">
+      <span class="logo-text">VR Mover</span>
+      <span class="beta-badge" title="This interactive demo is a work-in-progress reproduction">BETA</span>
+    </a>
+    <span class="subtitle" id="subtitle">3D Demo · stand in the room and tell the assistant to move things around you</span>
+    <button class="btn btn-icon" id="btn-menu" title="Menu" aria-label="Menu" aria-expanded="false">☰</button>
+    <div class="header-actions" id="header-actions">
+      <button class="btn btn-icon" id="btn-help" title="Intro &amp; guided tour">?</button>
+      <button class="btn btn-icon" id="theme-toggle" title="Toggle light / dark"><span id="theme-icon">🌙</span></button>
+      <button class="btn" id="btn-settings">⚙ Settings</button>
+      <a href="demo.html" class="btn" title="Switch to the 2D top-down demo">2D</a>
+      <a href="code/" class="btn">Code</a>
+      <a href="index.html" class="btn">← Paper</a>
+    </div>
+  </header>
+
+  <!-- Palette / object catalog -->
+  <aside id="palette">
+    <div class="palette-head">
+      <h3>Objects</h3>
+    </div>
+    <div id="prefab-list"><!-- populated by JS --></div>
+    <div id="instructions" class="palette-instructions">
+      <div id="instructions-toggle">
+        <span>📖 How to use</span>
+        <span class="arrow">▼</span>
+      </div>
+      <div id="instructions-body">
+        <ol>
+          <li><strong>Set API key:</strong> open <em>Settings</em> → <em>🔑 quick-start</em> picks a provider (some free) and autofills it; paste your key.</li>
+          <li><strong>Move around:</strong> <strong>WASD</strong> walks while the mouse is over the room; <strong>right-drag</strong> to look; scroll to step forward/back. The cursor stays free, so the panels are always clickable — no mode switching.</li>
+          <li><strong>Hover an object</strong> → its <strong>unified gizmo</strong> appears centred on it: drag a coloured <em>arrow</em> to move on that axis, a <em>plane square</em> to slide in that plane, a <em>ring</em> to rotate, an axis <em>cube</em> to scale that axis, or the white centre cube to scale uniformly. <strong>Click</strong> objects to <strong>select</strong> them — you can select <strong>several at once</strong> (each gets an outline + an <span class="ibadge ibadge-o">o</span> token); <kbd class="kbd">Esc</kbd> clears the selection.</li>
+          <li><strong>Left-click any surface</strong> — floor, wall, ceiling or an object → <span class="ibadge ibadge-h">here</span> (a cursor showing the surface) · <strong>left-drag</strong> → a line with a direction arrow · <strong>Shift+left-drag</strong> → an area. Deleting a token removes its marker too.</li>
+          <li><strong>Click a catalog object</strong> to drop one in front of you, or <strong>＋ Add object</strong> to build your own from a shape; <kbd class="kbd">Del</kbd> removes the selected object.</li>
+          <li>Type a command, then <strong>Send</strong> — the LLM streams back 3D (x/y/z) API calls.</li>
+          <li><strong>Gaze</strong>: the assistant tracks what you <em>look at</em> (see <span style="white-space:nowrap">👁 looking at…</span>), so you can say <em>“move this here”</em> or <em>“turn that toward me”</em> and it resolves <em>this/that</em> from your view.</li>
+        </ol>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 3D viewport -->
+  <main id="canvas-area">
+    <div class="canvas-chrome" id="canvas-chrome">
+      <div id="chrome-spacer"></div>
+      <button class="tool-btn" id="tool-reset" title="Recenter the camera">⌂ Recenter</button>
+      <button class="tool-btn" id="tool-delete" title="Delete the hovered object (Del)">🗑 Delete</button>
+      <button class="tool-btn" id="clear-scene" title="Remove every object">Clear scene</button>
+      <button class="tool-btn" id="load-example" title="Reload the example room">Load example</button>
+    </div>
+    <div id="three-viewport">
+      <div id="view-hint"><strong>WASD</strong> walk · <strong>right-drag</strong> look</div>
+      <div id="sel-readout"></div>
+      <div id="gaze-readout" title="What the assistant infers you are looking at (gaze / head-stay frames)"></div>
+      <!-- Mobile on-screen controls (touch only) -->
+      <button id="palette-toggle" title="Show / hide the object list" aria-label="Objects">▦ Objects</button>
+      <span class="beta-badge beta-badge-mobile" title="Work-in-progress reproduction">BETA</span>
+      <div id="joystick"><div id="joynub"></div></div>
+      <div id="touch-modes">
+        <button class="tmode active" data-mode="look" title="Drag to rotate the camera">Look</button>
+        <button class="tmode" data-mode="line" title="Drag on a surface to draw a line">Line</button>
+        <button class="tmode" data-mode="area" title="Drag on a surface to mark an area">Area</button>
+      </div>
+      <div id="touch-hint">Left pad = walk · drag = look · tap = select / here</div>
+    </div>
+  </main>
+
+  <!-- Response panel -->
+  <aside id="resp-panel">
+    <div id="resp-header">
+      <h3>LLM Responses</h3>
+      <button id="resp-clear">Clear</button>
+    </div>
+    <div id="resp-log">
+      <div id="resp-placeholder">
+        Configure your API key in Settings, then type a command.
+      </div>
+    </div>
+  </aside>
+
+  <!-- Input bar -->
+  <div id="input-bar">
+    <div id="mic-cluster">
+      <button id="stt-btn" title="Microphone (push to talk)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <rect x="9" y="3" width="6" height="11" rx="3"/>
+          <path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>
+        </svg>
+      </button>
+      <div id="voice-mode" title="Voice input mode">
+        <button class="vm-btn active" id="vm-auto" data-mode="auto">Auto</button>
+        <button class="vm-btn" id="vm-hold" data-mode="hold">Hold</button>
+      </div>
+    </div>
+    <div id="editor-wrap">
+      <div id="editor" contenteditable="true" data-placeholder='Tell the assistant… e.g. "bring the chair next to me", "turn the TV toward the couch"'></div>
+    </div>
+    <button id="send-btn" title="Send (Enter)">Send</button>
+    <button id="clear-input" title="Clear the message &amp; markers">Clear</button>
+    <div id="input-controls">
+      <div class="toggle-row">
+        <span id="status-dot"></span>
+        <span id="status-text">idle</span>
+      </div>
+      <div class="toggle-row">
+        <input type="checkbox" id="chk-stream" checked>
+        <label for="chk-stream">Stream</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile tab switcher -->
+  <nav id="mobile-tabs">
+    <button class="mtab active" id="mtab-scene">Scene</button>
+    <button class="mtab" id="mtab-resp">Responses</button>
+  </nav>
+
+</div><!-- #app -->
+
+<div id="toast-container"></div>
+
+<!-- ── Entry gate (touch): fullscreen + landscape are prerequisites to use the demo ── -->
+<div id="rotate-overlay" role="dialog" aria-modal="true" aria-label="Enter the 3D demo">
+  <div class="gate-card">
+    <!-- Step 1: browsers WITH a fullscreen API → tap to enter (a user gesture is required). -->
+    <div class="gate-enter">
+      <div class="gate-icon">🕶️</div>
+      <div class="gate-rotate-msg">VR Mover · 3D Demo</div>
+      <div class="gate-rotate-sub">Tap to enter full-screen, then turn your phone sideways.</div>
+      <button id="gate-enter-btn" class="btn btn-primary gate-btn">Enter the demo</button>
+    </div>
+    <!-- Step 2: fullscreen ok (or no FS API) but still portrait → rotate. -->
+    <div class="gate-rotate">
+      <div class="gate-icon gate-icon-rot">📱↻</div>
+      <div class="gate-rotate-msg">Rotate your phone to landscape</div>
+      <div class="gate-rotate-sub">to play with the 3D demo</div>
+      <div class="gate-rotate-sub gate-ios">📱 iPhone: tap <strong>aA</strong> in the address bar → <strong>Hide Toolbar</strong> for full screen.</div>
+    </div>
+  </div>
+</div>
+<!-- Exit-fullscreen button (top-left), shown only while in fullscreen. -->
+<button id="exit-fs-btn" title="Exit full-screen" aria-label="Exit full-screen">✕</button>
+
+<!-- ── Welcome modal + guided tour ── -->
+<div class="modal-overlay" id="welcome-overlay">
+  <div class="modal" id="welcome-modal">
+    <div class="modal-icon">
+      <span class="logo-disc"><img src="assets/vr-mover-logo-wo-text.svg" alt=""></span>
+    </div>
+    <h2>Welcome to the VR Mover 3D demo</h2>
+    <p class="modal-lead">
+      Stand <strong>inside</strong> a room and tell an LLM how to rearrange the furniture around you. Walk about,
+      select objects, point at the floor, and watch it stream back 3D API calls that move, rotate and scale things
+      in real time — the same reasoning core as the VR system.
+    </p>
+    <ul class="modal-points">
+      <li>
+        <span class="mp-icon">🚶</span>
+        <div><strong>First-person navigation</strong> — <em>WASD</em> to walk, <em>right-drag</em> to look, scroll to step forward/back (touch: joystick + drag). The cursor stays free, so every panel is clickable.</div>
+      </li>
+      <li>
+        <span class="mp-icon">🎛️</span>
+        <div><strong>Gizmo editing</strong> — click an object to select it, then drag its arrows (move), rings (rotate) or cubes (scale). Objects always stay inside the room.</div>
+      </li>
+      <li>
+        <span class="mp-icon">🧱</span>
+        <div><strong>Add your own objects</strong> — build custom items from a cube, sphere, cylinder or cone; they join the LLM’s catalog instantly.</div>
+      </li>
+      <li>
+        <span class="mp-icon">🔑</span>
+        <div><strong>LLM API key</strong> — required to run the demo. The <em>Settings → 🔑 quick-start</em> lists providers (several with a <strong>free tier</strong>) and autofills everything. Your key stays in your browser only.</div>
+      </li>
+    </ul>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="welcome-tour">Start the guided tour</button>
+      <button class="btn" id="welcome-skip">Skip — explore on my own</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Add-object editor (build a custom object from a primitive) ── -->
+<div class="modal-overlay" id="editor-overlay">
+  <div class="modal modal-wide" id="obj-editor">
+    <h2 id="oe-title">Add object</h2>
+    <div class="oe-grid">
+      <div class="oe-fields">
+        <div class="field">
+          <label for="oe-name">Name <span class="counter" id="oe-name-count">0/20</span></label>
+          <input type="text" id="oe-name" maxlength="20" placeholder="Box">
+        </div>
+        <div class="field">
+          <label for="oe-desc">Description <span class="counter" id="oe-desc-count">0/120</span></label>
+          <textarea id="oe-desc" maxlength="120" rows="2" placeholder="A small storage box"></textarea>
+          <div class="hint">Sent to the LLM as part of the prefab catalog.</div>
+        </div>
+        <div class="field">
+          <label>Base shape</label>
+          <div id="oe-shapes"><!-- shape picker populated by JS --></div>
+        </div>
+        <div class="oe-dims oe-dims3">
+          <div class="field"><label for="oe-w">Width (m)</label><input type="number" id="oe-w" min="0.05" max="5" step="0.05" value="0.5"></div>
+          <div class="field"><label for="oe-h">Height (m)</label><input type="number" id="oe-h" min="0.05" max="5" step="0.05" value="0.5"></div>
+          <div class="field"><label for="oe-d">Depth (m)</label><input type="number" id="oe-d" min="0.05" max="5" step="0.05" value="0.5"></div>
+        </div>
+        <div class="field oe-color-field">
+          <label for="oe-color">Colour</label>
+          <input type="color" id="oe-color" value="#58a6ff">
+        </div>
+      </div>
+      <div class="oe-preview-col">
+        <label>Live preview</label>
+        <canvas id="oe-preview" width="240" height="200"></canvas>
+        <div class="hint">Spins so you can see all sides.</div>
+      </div>
+    </div>
+    <div class="hint" id="oe-note">Saving updates the LLM’s catalog immediately (the conversation history starts fresh).</div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="oe-save">Save</button>
+      <button class="btn" id="oe-cancel">Cancel</button>
+      <button class="btn btn-danger" id="oe-delete" style="margin-left:auto">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Settings modal (shares the API key with the 2D demo) ── -->
+<div class="modal-overlay" id="settings-overlay">
+ <div class="modal modal-wide" id="settings-modal">
+  <div id="settings-header">
+    <h2>⚙ Settings</h2>
+    <button id="settings-close" title="Close">✕</button>
+  </div>
+  <div id="settings-body">
+    <div class="settings-group">
+      <div class="quickstart" id="quickstart">
+        <div class="quickstart-head" id="quickstart-toggle">
+          <span>🔑 No API key yet? Set one up in ~1 minute</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="quickstart-body">
+          <p class="hint">
+            The demo talks directly from your browser to any <strong>OpenAI-compatible</strong> chat API.
+            Pick a provider to auto-fill the endpoint and a suggested model, then paste the key you create.
+            Some providers have a <strong>free tier</strong> — no card needed. (Shared with the 2D demo.)
+          </p>
+          <div class="field">
+            <label for="s-provider">Provider preset</label>
+            <select id="s-provider">
+              <option value="openai">OpenAI — GPT-4o (paid)</option>
+              <option value="openrouter">OpenRouter — many models, some free</option>
+              <option value="azure">Azure OpenAI — GPT-4o</option>
+              <option value="moonshot">Kimi · Moonshot</option>
+              <option value="siliconflow">SiliconFlow (CN) — free tier</option>
+              <option value="anthropic">Claude · Anthropic API</option>
+              <option value="custom" selected>Custom / other (don't change my fields)</option>
+            </select>
+            <div class="hint" id="s-provider-note">
+              Choose a provider above to autofill the Base URL &amp; model, with a link to create a key.
+            </div>
+            <div class="provider-links" id="s-provider-link"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <h4>LLM API</h4>
+      <div class="field">
+        <label for="s-baseurl">Base URL</label>
+        <input type="text" id="s-baseurl" placeholder="https://api.openai.com/v1">
+      </div>
+      <div class="field">
+        <label for="s-apikey">API Key</label>
+        <input type="password" id="s-apikey" placeholder="sk-…">
+        <div class="hint">
+          Stored in your browser's <em>localStorage</em> only — sent <strong>directly to your provider</strong>.
+          Don't have one? <a href="#" id="s-getkey-link" target="_blank" rel="noopener noreferrer">Get a key →</a>
+        </div>
+      </div>
+      <div class="field">
+        <label for="s-model">Model</label>
+        <input type="text" id="s-model" placeholder="gpt-4o">
+        <div class="hint">The model sets the trade-off between <strong>intelligence</strong> and <strong>response speed</strong>: bigger models (GPT-4-class, Claude Opus/Sonnet) reason more reliably about placement &amp; spatial relationships but stream slower; smaller/faster ones (mini · flash · 8B) reply quickly but more often misplace or misjudge objects.</div>
+      </div>
+      <div class="field">
+        <label for="s-auth">Auth Style</label>
+        <select id="s-auth">
+          <option value="bearer">Bearer token (OpenAI, Groq, OpenRouter…)</option>
+          <option value="api-key">api-key header (Azure OpenAI)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="s-maxtok">Max Tokens</label>
+        <input type="number" id="s-maxtok" value="2048" min="64" max="8192" step="64">
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <h4>Context &amp; Behaviour</h4>
+      <div class="field">
+        <label for="s-ctxlen">Context window (pairs)</label>
+        <div class="range-row">
+          <input type="range" id="s-ctxlen" min="1" max="20" value="5">
+          <span class="range-val" id="s-ctxlen-val">5</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="s-temp">Temperature</label>
+        <div class="range-row">
+          <input type="range" id="s-temp" min="0" max="1" value="0.3" step="0.05">
+          <span class="range-val" id="s-temp-val">0.3</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="s-lang">STT Language</label>
+        <select id="s-lang">
+          <option value="en-US">English (US) — en-US</option>
+          <option value="zh-CN">中文 · 普通话 (简体) — zh-CN</option>
+          <option value="ar-SA">العربية — ar-SA</option>
+          <option value="cs-CZ">Čeština — cs-CZ</option>
+          <option value="da-DK">Dansk — da-DK</option>
+          <option value="nl-NL">Nederlands — nl-NL</option>
+          <option value="en-AU">English (Australia) — en-AU</option>
+          <option value="en-CA">English (Canada) — en-CA</option>
+          <option value="en-GB">English (UK) — en-GB</option>
+          <option value="en-IN">English (India) — en-IN</option>
+          <option value="fi-FI">Suomi — fi-FI</option>
+          <option value="fr-CA">Français (Canada) — fr-CA</option>
+          <option value="fr-FR">Français (France) — fr-FR</option>
+          <option value="de-DE">Deutsch — de-DE</option>
+          <option value="el-GR">Ελληνικά — el-GR</option>
+          <option value="he-IL">עברית — he-IL</option>
+          <option value="hi-IN">हिन्दी — hi-IN</option>
+          <option value="hu-HU">Magyar — hu-HU</option>
+          <option value="id-ID">Indonesia — id-ID</option>
+          <option value="it-IT">Italiano — it-IT</option>
+          <option value="ja-JP">日本語 — ja-JP</option>
+          <option value="ko-KR">한국어 — ko-KR</option>
+          <option value="ms-MY">Melayu — ms-MY</option>
+          <option value="nb-NO">Norsk Bokmål — nb-NO</option>
+          <option value="pl-PL">Polski — pl-PL</option>
+          <option value="pt-BR">Português (Brasil) — pt-BR</option>
+          <option value="pt-PT">Português (Portugal) — pt-PT</option>
+          <option value="ro-RO">Română — ro-RO</option>
+          <option value="ru-RU">Русский — ru-RU</option>
+          <option value="es-ES">Español (España) — es-ES</option>
+          <option value="es-MX">Español (México) — es-MX</option>
+          <option value="sv-SE">Svenska — sv-SE</option>
+          <option value="ta-IN">தமிழ் — ta-IN</option>
+          <option value="te-IN">తెలుగు — te-IN</option>
+          <option value="th-TH">ไทย — th-TH</option>
+          <option value="tr-TR">Türkçe — tr-TR</option>
+          <option value="uk-UA">Українська — uk-UA</option>
+          <option value="vi-VN">Tiếng Việt — vi-VN</option>
+          <option value="zh-HK">中文 · 粵語 (香港) — zh-HK</option>
+          <option value="zh-TW">中文 · 國語 (台灣) — zh-TW</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="settings-footer">
+    <button class="btn btn-primary" id="s-save">Save</button>
+    <button class="btn" id="s-cancel">Cancel</button>
+    <button class="btn btn-danger" id="s-clear-key" style="margin-left:auto">Clear key</button>
+  </div>
+ </div>
+</div>
+
+<script type="module" src="js/demo3d.js?v=55"></script>
+</body>
+</html>

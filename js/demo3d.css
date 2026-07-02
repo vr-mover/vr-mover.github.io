@@ -1,0 +1,331 @@
+/* ============================================================
+   VR Mover · Interactive 3D Demo — demo3d.css
+   Layered on top of demo.css; only the 3D viewport + toolbar live here.
+   ============================================================ */
+
+#three-viewport {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+}
+#three-viewport canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  outline: none;
+}
+
+/* Toolbar in the canvas chrome */
+.tool-group { display: flex; gap: 4px; align-items: center; }
+.tool-sep { width: 1px; height: 18px; background: var(--border); margin: 0 4px; }
+.tool-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-family: var(--font);
+  padding: 4px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: color .12s, border-color .12s, background .12s;
+}
+.tool-btn:hover { color: var(--text); }
+.tool-btn.active { color: #fff; background: var(--accent2); border-color: var(--accent2); }
+#chrome-spacer { flex: 1; }
+
+/* Floating hint + camera help over the viewport */
+#view-hint {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  font-size: 0.66rem;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 9px;
+  pointer-events: none;
+  line-height: 1.5;
+  max-width: 60%;
+}
+#view-hint kbd {
+  font-family: var(--mono);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0 4px;
+  font-size: 0.9em;
+}
+
+/* Selected-object readout, top-right of the viewport */
+#sel-readout {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  font-size: 0.68rem;
+  font-family: var(--mono);
+  color: var(--text);
+  background: color-mix(in srgb, var(--surface) 85%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  pointer-events: none;
+  display: none;
+}
+#sel-readout.show { display: block; }
+#sel-readout b { color: var(--accent); }
+
+/* Gaze indicator — what the LLM infers you're looking at (head-stay frames).
+   Top-LEFT, opposite the object-detail readout (top-right), so they never overlap. */
+#gaze-readout {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  font-size: 0.66rem;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px 9px;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: 45%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: none;
+}
+#gaze-readout.show { display: block; }
+#gaze-readout b { color: var(--accent2); }
+
+/* The palette items in 3D are click-to-add. */
+.prefab-item { cursor: pointer; }
+.prefab-tag {
+  font-size: 0.58rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--accent); background: color-mix(in srgb, var(--accent) 15%, transparent);
+  border-radius: 4px; padding: 0 4px; margin-left: 5px; vertical-align: middle;
+}
+
+/* ── Add-object editor: shape picker, 3-axis dims, colour ── */
+#oe-shapes {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+#oe-shapes .oe-icon-btn {
+  flex-direction: column;
+  gap: 3px;
+  aspect-ratio: auto;
+  padding: 8px 2px;
+}
+#oe-shapes .oe-icon-btn span { font-size: 0.6rem; }
+.oe-dims3 { gap: 8px; }
+.oe-dims3 .field { flex: 1; min-width: 0; }
+.oe-color-field { display: flex; align-items: center; gap: 10px; }
+.oe-color-field label { margin-bottom: 0; }
+.oe-color-field input[type="color"] {
+  width: 46px; height: 30px; padding: 0;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--bg); cursor: pointer;
+}
+#oe-preview { aspect-ratio: 6 / 5; height: auto; }
+
+.hidden { display: none !important; }
+
+/* Manipulation-not-design banner */
+#manip-banner {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: 999px;
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+
+/* First-person crosshair */
+#crosshair {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+  text-shadow: 0 0 3px rgba(0,0,0,0.9);
+  pointer-events: none;
+  opacity: 0.85;
+  z-index: 5;
+}
+
+/* "Click to enter" pointer-lock overlay */
+#lock-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+  backdrop-filter: blur(2px);
+  cursor: pointer;
+  z-index: 8;
+}
+#lock-overlay.hidden { display: none; }
+.lock-card {
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px 26px;
+  box-shadow: 0 16px 44px rgba(0,0,0,0.4);
+  max-width: 340px;
+}
+.lock-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
+.lock-sub { font-size: 0.82rem; color: var(--muted); line-height: 1.6; margin-bottom: 14px; }
+.lock-sub strong { color: var(--text); }
+
+/* ============================================================
+   Mobile / touch controls + landscape lock
+   ============================================================ */
+/* #palette-toggle visibility is owned by demo.css (hidden on desktop, shown on mobile). */
+#joystick, #touch-modes, #touch-hint, #rotate-overlay { display: none; }
+
+/* ── Entry gate: fullscreen + landscape required (touch) ── */
+#rotate-overlay {
+  position: fixed; inset: 0; z-index: 400;
+  background: var(--bg);
+  align-items: center; justify-content: center; text-align: center;
+  padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right))
+           max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+}
+.gate-card { max-width: 360px; width: 100%; color: var(--text); }
+.gate-icon { font-size: 2.8rem; margin-bottom: 14px; }
+.gate-icon-rot { animation: rothint 1.6s ease-in-out infinite; }
+@keyframes rothint { 0%,100% { transform: rotate(0); } 50% { transform: rotate(90deg); } }
+.gate-rotate-msg { font-size: 1.05rem; font-weight: 600; line-height: 1.5; }
+.gate-rotate-sub { color: var(--muted); font-size: 0.85rem; font-weight: 400; margin-top: 6px; }
+.gate-btn { margin-top: 18px; font-size: 1rem; padding: 12px 30px; }
+/* Default = the rotate step (covers the no-fullscreen-API case, e.g. iPhone). The
+   "Enter the demo" button only appears where a fullscreen API exists AND we're not
+   yet in fullscreen — so we never show a fullscreen button that can't work. */
+.gate-enter { display: none; }
+.gate-rotate { display: block; }
+html.has-fs:not(.fs-ok) .gate-enter { display: block; }
+html.has-fs:not(.fs-ok) .gate-rotate { display: none; }
+/* iPhone-only "hide the Safari toolbar" tip (no FS API there). */
+.gate-ios { display: none; margin-top: 14px; }
+html.is-ios.no-fs .gate-ios { display: block; }
+/* Exit-fullscreen ✕, top-left, only while in fullscreen. */
+#exit-fs-btn {
+  position: fixed; z-index: 401; display: none;
+  top: max(8px, env(safe-area-inset-top)); left: max(8px, env(safe-area-inset-left));
+  width: 36px; height: 36px; border-radius: 50%;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  border: 1px solid var(--border); color: var(--text);
+  font-size: 1rem; line-height: 1; cursor: pointer; backdrop-filter: blur(4px);
+  align-items: center; justify-content: center;
+}
+html.is-fs #exit-fs-btn { display: inline-flex; }
+
+/* Virtual joystick (bottom-left of the viewport) */
+#joystick {
+  position: absolute; left: 18px; bottom: 18px;
+  width: 116px; height: 116px; border-radius: 50%;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  border: 1px solid var(--border);
+  touch-action: none; z-index: 20;
+  align-items: center; justify-content: center;
+}
+#joynub {
+  position: absolute; left: 50%; top: 50%;
+  width: 48px; height: 48px; margin: -24px 0 0 -24px; border-radius: 50%;
+  background: var(--accent); opacity: 0.85;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+}
+/* Draw-mode toggle (top-right of viewport) */
+#touch-modes {
+  position: absolute; right: 12px; top: 10px; z-index: 20;
+  gap: 6px;
+}
+#touch-modes .tmode {
+  min-width: 52px; height: 34px; padding: 0 12px; border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--border); color: var(--text);
+  font: 600 12px/1 system-ui, sans-serif; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+#touch-modes .tmode.active { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+#touch-hint {
+  position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%);
+  z-index: 20; font-size: 0.66rem; color: var(--muted);
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  border: 1px solid var(--border); border-radius: 999px; padding: 4px 12px;
+  pointer-events: none; white-space: nowrap;
+}
+
+/* Show the touch UI only on coarse-pointer (touch) devices */
+@media (pointer: coarse) {
+  #joystick, #touch-hint { display: flex; }
+  #touch-modes { display: flex; }
+  #view-hint { display: none; }
+  /* Hide the desktop mic cluster keyboard hint etc. — keep input usable */
+}
+/* Gate shows on touch until JS marks the app ready (fullscreen + landscape). JS toggles
+   html.app-ready / .is-fs — a media query can't detect "fullscreen exited in landscape". */
+@media (pointer: coarse) {
+  html:not(.app-ready) #rotate-overlay { display: flex; }
+}
+
+/* ============================================================
+   Mobile LANDSCAPE — maximise the 3D viewport.
+   Palette → narrow vertical side column, tabs → floating pills, slim header+input.
+   The only vertical budget is the header + input bar; the canvas gets the rest.
+   ============================================================ */
+@media (max-width: 960px) and (orientation: landscape) {
+  /* 3D-ONLY controls, layered over the SHARED mobile shell defined in demo.css
+     (full-screen canvas, object drawer + ▦ toggle, tool pills, tabs, input bar,
+     response sheet — all shared with the 2D demo). Here we add only what's unique
+     to the first-person 3D view: the joystick, look/line/area modes, the gaze +
+     selection readouts, and the fullscreen / ✕ gate. */
+
+  /* Mode pills (Look/Line/Area) bottom-centre; nudge the tabs up to share that row. */
+  #touch-modes {
+    position: fixed; z-index: 26; flex-direction: row;
+    left: 50%; transform: translateX(-50%);
+    top: auto; right: auto; bottom: calc(max(5px, env(safe-area-inset-bottom)) + 54px);
+    gap: 6px;
+  }
+  #mobile-tabs { bottom: calc(max(5px, env(safe-area-inset-bottom)) + 54px); }
+
+  /* Readouts — gaze top-left, object-detail top-centre (clear of palette + tools). */
+  #gaze-readout { left: max(10px, calc(env(safe-area-inset-left) + 96px)); top: max(8px, env(safe-area-inset-top)); }  /* right of the ▦ Objects pill */
+  #sel-readout  { right: auto; left: 50%; transform: translateX(-50%); top: max(40px, calc(env(safe-area-inset-top) + 34px)); }
+  #touch-hint   { display: none; }
+  /* In real fullscreen the ✕ sits top-left, so shift the ▦ toggle + gaze readout right of it. */
+  html.is-fs #palette-toggle { left: calc(max(8px, env(safe-area-inset-left)) + 44px); }
+  html.is-fs #gaze-readout   { left: calc(max(8px, env(safe-area-inset-left)) + 140px); }
+  /* Desktop "WASD walk…" hint sits just ABOVE the input bar (sticky to the text area,
+     not blocking it). No display set → the `pointer: coarse` rule still hides it on touch. */
+  #view-hint {
+    bottom: calc(max(8px, env(safe-area-inset-bottom)) + 52px);
+    left: max(10px, env(safe-area-inset-left)); max-width: 56%;
+  }
+
+  /* Joystick: bottom-left overlay, above the input, clear of the rounded corner. */
+  #joystick {
+    left: max(16px, calc(env(safe-area-inset-left) + 6px));
+    bottom: calc(max(8px, env(safe-area-inset-bottom)) + 54px);
+    width: 104px; height: 104px;
+  }
+  #joynub { width: 44px; height: 44px; margin: -22px 0 0 -22px; }
+
+  /* Response sheet: full-screen overlay; the tabs (z-45) float above it to toggle back. */
+  #resp-panel {
+    position: fixed; inset: 0; z-index: 40; border: none;
+    /* keep the header + Clear button clear of the Dynamic Island / rounded corners */
+    padding: var(--sa-t) var(--sa-r) var(--sa-b) var(--sa-l);
+  }
+}

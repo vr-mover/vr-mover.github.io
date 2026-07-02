@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0d1117">
+  <title>VR Mover · Interactive 2D Demo</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="js/demo.css?v=17">
+  <!-- Apply the saved/system theme before first paint to avoid a flash. Shares
+       the localStorage 'theme' key with the project page. -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme')
+        || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<body>
+
+<!-- ── App root ──────────────────────────────────────────── -->
+<div id="app">
+
+  <!-- Header -->
+  <header id="header">
+    <a class="logo" href="index.html">
+      <img src="assets/vr-mover-logo-wo-text.svg" alt="VR Mover logo">
+      <span class="logo-text">VR Mover</span>
+      <span class="beta-badge" title="This interactive demo is a work-in-progress reproduction">BETA</span>
+    </a>
+    <span class="subtitle" id="subtitle">2D Interactive Demo — Top-down room view, LLM-powered object manipulation</span>
+    <button class="btn btn-icon" id="btn-menu" title="Menu">☰</button>
+    <div class="header-actions" id="header-actions">
+      <button class="btn btn-icon" id="theme-toggle" title="Toggle light / dark"><span id="theme-icon">🌙</span></button>
+      <button class="btn btn-icon" id="btn-help" title="Intro &amp; guided tour">?</button>
+      <a href="demo3d.html" class="btn" title="Switch to the 3D perspective demo">3D</a>
+      <a href="code/" class="btn">Code</a>
+      <button class="btn" id="btn-settings">⚙ Settings</button>
+      <a href="index.html" class="btn">← Paper</a>
+    </div>
+  </header>
+
+  <!-- Edge buttons to re-open a collapsed sidebar -->
+  <button id="expand-palette" class="edge-expand edge-expand-l" title="Show objects">›</button>
+  <button id="expand-resp" class="edge-expand edge-expand-r" title="Show responses">‹</button>
+
+  <!-- Palette / object catalog -->
+  <aside id="palette">
+    <div class="palette-head">
+      <h3>Objects</h3>
+      <div class="ph-actions">
+        <button id="palette-restore" title="Restore default catalog">↺</button>
+        <button id="palette-collapse" class="side-collapse" title="Collapse sidebar">‹</button>
+      </div>
+    </div>
+    <div id="prefab-list"><!-- populated by JS (objects + Add entry) --></div>
+    <div id="instructions" class="palette-instructions">
+      <div id="instructions-toggle">
+        <span>📖 How to use</span>
+        <span class="arrow">▼</span>
+      </div>
+      <div id="instructions-body">
+        <ol>
+          <li><strong>Set API key:</strong> open <em>Settings</em> → <em>🔑 quick-start</em> picks a provider (some free) and autofills it; paste your key.</li>
+          <li><strong>Hover</strong> an object → gizmo: drag the <em>centre square</em> to move, the <em>green forward handle</em> to rotate (scroll wheel also rotates).</li>
+          <li><strong>Click empty floor</strong> → hit-point + <span class="ibadge ibadge-h">h1</span> badge.</li>
+          <li><strong>Click object</strong> → select + <span class="ibadge ibadge-o">o1</span>; click again to deselect.</li>
+          <li><strong>Left-drag</strong> floor → line <span class="ibadge ibadge-l">l1</span>; <strong>right-drag</strong> → area <span class="ibadge ibadge-a">a1</span>.</li>
+          <li><strong>Hold right-click</strong> on object (~0.6 s) → delete (long-press on touch).</li>
+          <li><strong>Voice:</strong> <em>Auto</em> = continuous + auto-submit; <em>Hold</em> = push-to-talk.</li>
+          <li>Delete a badge with <kbd class="kbd">⌫</kbd> — the canvas marker is removed too.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="col-resizer col-resizer-r" id="resize-palette" title="Drag to resize"></div>
+  </aside>
+
+  <!-- Canvas area -->
+  <main id="canvas-area">
+    <!-- Mobile: shows/hides the object drawer (floating top-left pill). -->
+    <button id="palette-toggle" title="Show / hide the object list" aria-label="Objects">▦ Objects</button>
+    <span class="beta-badge beta-badge-mobile" title="Work-in-progress reproduction">BETA</span>
+    <div class="canvas-chrome" id="canvas-chrome">
+      <p id="legend">Hover = gizmo · Click = hit/select · Drag = line · Right-drag = area · Hold ⌥click = delete</p>
+      <button id="clear-scene" title="Remove every object and marker from the scene">Clear scene</button>
+      <button id="load-example" title="Reload the starter living-room scene">Load example</button>
+    </div>
+    <div class="canvas-viewport" id="canvas-viewport">
+      <canvas id="room-canvas"></canvas>
+    </div>
+  </main>
+
+  <!-- Response panel -->
+  <aside id="resp-panel">
+    <div class="col-resizer col-resizer-l" id="resize-resp" title="Drag to resize"></div>
+    <div id="resp-header">
+      <button id="resp-collapse" class="side-collapse" title="Collapse sidebar">›</button>
+      <h3>LLM Responses</h3>
+      <button id="resp-clear">Clear</button>
+    </div>
+    <div id="resp-log">
+      <div id="resp-placeholder">
+        Configure your API key in Settings, then speak or type a command.
+      </div>
+    </div>
+  </aside>
+
+  <!-- Input bar -->
+  <div id="input-bar">
+    <div id="mic-cluster">
+      <button id="stt-btn" title="Microphone">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <rect x="9" y="3" width="6" height="11" rx="3"/>
+          <path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>
+        </svg>
+      </button>
+      <div id="voice-mode" title="Voice input mode">
+        <button class="vm-btn active" id="vm-auto" data-mode="auto">Auto</button>
+        <button class="vm-btn" id="vm-hold" data-mode="hold">Hold</button>
+      </div>
+    </div>
+    <div id="editor-wrap">
+      <div id="editor" contenteditable="true" data-placeholder='Type or speak… e.g. "Put a chair here" then click the canvas'></div>
+    </div>
+    <button id="send-btn" title="Send (Enter)">Send</button>
+    <button id="clear-input" title="Clear the message &amp; markers">Clear</button>
+    <div id="input-controls">
+      <div class="toggle-row">
+        <span id="status-dot"></span>
+        <span id="status-text">idle</span>
+      </div>
+      <div class="toggle-row">
+        <input type="checkbox" id="chk-stream" checked>
+        <label for="chk-stream">Stream</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile tab switcher -->
+  <nav id="mobile-tabs">
+    <button class="mtab active" id="mtab-scene">Scene</button>
+    <button class="mtab" id="mtab-resp">Responses</button>
+  </nav>
+
+</div><!-- #app -->
+
+<!-- ── Drag ghost ─────────────────────────────────────────── -->
+<div id="drag-ghost"></div>
+
+<!-- ── Toast container ───────────────────────────────────── -->
+<div id="toast-container"></div>
+
+<!-- ── Welcome modal ─────────────────────────────────────── -->
+<div class="modal-overlay" id="welcome-overlay">
+  <div class="modal" id="welcome-modal">
+    <div class="modal-icon">
+      <span class="logo-disc"><img src="assets/vr-mover-logo-wo-text.svg" alt=""></span>
+    </div>
+    <h2>Welcome to the VR Mover demo</h2>
+    <p class="modal-lead">
+      A 2D, top-down reproduction of <strong>VR Mover</strong>: tell an LLM what to do with the
+      furniture — by voice or text — while pointing, drawing lines and marking areas on the canvas,
+      and watch it stream back API calls that rearrange the room in real time.
+    </p>
+    <ul class="modal-points">
+      <li>
+        <span class="mp-icon">🎙️</span>
+        <div><strong>Microphone</strong> — voice input needs the browser's mic permission; it is requested only when you press the mic button.</div>
+      </li>
+      <li>
+        <span class="mp-icon">🔑</span>
+        <div><strong>LLM API key</strong> — required to run the demo. No key yet? The <em>Settings → 🔑 quick-start</em> lists providers (several with a <strong>free tier</strong>), autofills the endpoint, and links you straight to the key page. Your key is kept in your browser's <em>localStorage</em> only and is sent directly to your chosen provider, nowhere else.</div>
+      </li>
+      <li>
+        <span class="mp-icon">🛋️</span>
+        <div><strong>Starter scene</strong> — the demo opens with a small living room you can rearrange right away. Use <em>Clear scene</em> for a blank floor, or <em>Load example</em> to bring it back.</div>
+      </li>
+      <li>
+        <span class="mp-icon">🧭</span>
+        <div><strong>Guided tour</strong> — ~1 minute, and now walks you through the gizmo (move &amp; rotate), pointing gestures, and typing or speaking a command.</div>
+      </li>
+    </ul>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="welcome-tour">Start the guided tour</button>
+      <button class="btn" id="welcome-skip">Skip — explore on my own</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Object catalog editor modal ───────────────────────── -->
+<div class="modal-overlay" id="editor-overlay">
+  <div class="modal modal-wide" id="obj-editor">
+    <h2 id="oe-title">Edit object</h2>
+    <div class="oe-grid">
+      <div class="oe-fields">
+        <div class="field">
+          <label for="oe-name">Name <span class="counter" id="oe-name-count">0/20</span></label>
+          <input type="text" id="oe-name" maxlength="20" placeholder="Chair">
+        </div>
+        <div class="field">
+          <label for="oe-desc">Description <span class="counter" id="oe-desc-count">0/120</span></label>
+          <textarea id="oe-desc" maxlength="120" rows="3" placeholder="A standard four-legged chair"></textarea>
+          <div class="hint">Sent to the LLM as part of the prefab catalog.</div>
+        </div>
+        <div class="oe-dims">
+          <div class="field">
+            <label for="oe-w">Width (m)</label>
+            <input type="number" id="oe-w" min="0.05" max="5" step="0.05" value="0.5">
+          </div>
+          <div class="field">
+            <label for="oe-d">Depth (m)</label>
+            <input type="number" id="oe-d" min="0.05" max="5" step="0.05" value="0.5">
+          </div>
+        </div>
+        <div class="hint">The bounding box always equals this size.</div>
+        <div class="field">
+          <label>Icon</label>
+          <div id="oe-icons"><!-- icon picker populated by JS --></div>
+        </div>
+      </div>
+      <div class="oe-preview-col">
+        <label>Live preview</label>
+        <canvas id="oe-preview" width="240" height="200"></canvas>
+        <div class="hint">Rendered exactly as on the main canvas.</div>
+      </div>
+    </div>
+    <div class="hint" id="oe-note">Catalog changes update the LLM system prompt immediately (the conversation history starts fresh).</div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="oe-save">Save</button>
+      <button class="btn" id="oe-cancel">Cancel</button>
+      <button class="btn btn-danger" id="oe-delete" style="margin-left:auto">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Settings modal ────────────────────────────────────── -->
+<div class="modal-overlay" id="settings-overlay">
+ <div class="modal modal-wide" id="settings-modal">
+  <div id="settings-header">
+    <h2>⚙ Settings</h2>
+    <button id="settings-close" title="Close">✕</button>
+  </div>
+  <div id="settings-body">
+
+    <!-- Quick start: get a key + autofill a provider -->
+    <div class="settings-group">
+      <div class="quickstart" id="quickstart">
+        <div class="quickstart-head" id="quickstart-toggle">
+          <span>🔑 No API key yet? Set one up in ~1 minute</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="quickstart-body">
+          <p class="hint">
+            The demo talks directly from your browser to any <strong>OpenAI-compatible</strong> chat API.
+            Pick a provider to auto-fill the endpoint and a suggested model, then paste the key you create.
+            Some providers have a <strong>free tier</strong> — no card needed.
+          </p>
+          <div class="field">
+            <label for="s-provider">Provider preset</label>
+            <select id="s-provider">
+              <option value="openai">OpenAI — GPT-4o (paid)</option>
+              <option value="openrouter">OpenRouter — many models, some free</option>
+              <option value="azure">Azure OpenAI — GPT-4o</option>
+              <option value="moonshot">Kimi · Moonshot</option>
+              <option value="siliconflow">SiliconFlow (CN) — free tier</option>
+              <option value="anthropic">Claude · Anthropic API</option>
+              <option value="custom" selected>Custom / other (don't change my fields)</option>
+            </select>
+            <div class="hint" id="s-provider-note">
+              Choose a provider above to autofill the Base URL &amp; model, with a link to create a key.
+            </div>
+            <div class="provider-links" id="s-provider-link"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <h4>LLM API</h4>
+      <div class="field">
+        <label for="s-baseurl">Base URL</label>
+        <input type="text" id="s-baseurl" placeholder="https://api.openai.com/v1">
+        <div class="hint">OpenAI-compatible endpoint. For Azure: https://&lt;resource&gt;.openai.azure.com/openai/deployments/&lt;deployment&gt;</div>
+      </div>
+      <div class="field">
+        <label for="s-apikey">API Key</label>
+        <input type="password" id="s-apikey" placeholder="sk-…">
+        <div class="hint">
+          Stored in your browser's <em>localStorage</em> only — it is sent <strong>directly to your chosen provider</strong> and nowhere else.
+          Don't have one? <a href="#" id="s-getkey-link" target="_blank" rel="noopener noreferrer">Get a key →</a>
+        </div>
+      </div>
+      <div class="field">
+        <label for="s-model">Model</label>
+        <input type="text" id="s-model" placeholder="gpt-4o">
+        <div class="hint">The model sets the trade-off between <strong>intelligence</strong> and <strong>response speed</strong>: bigger models (GPT-4-class, Claude Opus/Sonnet) reason more reliably about placement &amp; spatial relationships but stream slower; smaller/faster ones (mini · flash · 8B) reply quickly but more often misplace or misjudge objects.</div>
+      </div>
+      <div class="field">
+        <label for="s-auth">Auth Style</label>
+        <select id="s-auth">
+          <option value="bearer">Bearer token (OpenAI, Groq, OpenRouter…)</option>
+          <option value="api-key">api-key header (Azure OpenAI)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="s-maxtok">Max Tokens</label>
+        <input type="number" id="s-maxtok" value="2048" min="64" max="8192" step="64">
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <h4>Context &amp; Behaviour</h4>
+      <div class="field">
+        <label for="s-ctxlen">Context window (pairs)</label>
+        <div class="range-row">
+          <input type="range" id="s-ctxlen" min="1" max="20" value="5">
+          <span class="range-val" id="s-ctxlen-val">5</span>
+        </div>
+        <div class="hint">Number of recent user/assistant turns kept in context.</div>
+      </div>
+      <div class="field">
+        <label for="s-delay">Speech-confirm delay (ms)</label>
+        <div class="range-row">
+          <input type="range" id="s-delay" min="200" max="3000" value="600" step="100">
+          <span class="range-val" id="s-delay-val">600</span>
+        </div>
+        <div class="hint">Silence after speech ends before auto-submit (Auto voice mode).</div>
+      </div>
+      <div class="field">
+        <label for="s-temp">Temperature</label>
+        <div class="range-row">
+          <input type="range" id="s-temp" min="0" max="1" value="0.3" step="0.05">
+          <span class="range-val" id="s-temp-val">0.3</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="s-lang">STT Language</label>
+        <select id="s-lang">
+          <option value="en-US">English (US) — en-US</option>
+          <option value="zh-CN">中文 · 普通话 (简体) — zh-CN</option>
+          <option value="ar-SA">العربية — ar-SA</option>
+          <option value="cs-CZ">Čeština — cs-CZ</option>
+          <option value="da-DK">Dansk — da-DK</option>
+          <option value="nl-NL">Nederlands — nl-NL</option>
+          <option value="en-AU">English (Australia) — en-AU</option>
+          <option value="en-CA">English (Canada) — en-CA</option>
+          <option value="en-GB">English (UK) — en-GB</option>
+          <option value="en-IN">English (India) — en-IN</option>
+          <option value="fi-FI">Suomi — fi-FI</option>
+          <option value="fr-CA">Français (Canada) — fr-CA</option>
+          <option value="fr-FR">Français (France) — fr-FR</option>
+          <option value="de-DE">Deutsch — de-DE</option>
+          <option value="el-GR">Ελληνικά — el-GR</option>
+          <option value="he-IL">עברית — he-IL</option>
+          <option value="hi-IN">हिन्दी — hi-IN</option>
+          <option value="hu-HU">Magyar — hu-HU</option>
+          <option value="id-ID">Indonesia — id-ID</option>
+          <option value="it-IT">Italiano — it-IT</option>
+          <option value="ja-JP">日本語 — ja-JP</option>
+          <option value="ko-KR">한국어 — ko-KR</option>
+          <option value="ms-MY">Melayu — ms-MY</option>
+          <option value="nb-NO">Norsk Bokmål — nb-NO</option>
+          <option value="pl-PL">Polski — pl-PL</option>
+          <option value="pt-BR">Português (Brasil) — pt-BR</option>
+          <option value="pt-PT">Português (Portugal) — pt-PT</option>
+          <option value="ro-RO">Română — ro-RO</option>
+          <option value="ru-RU">Русский — ru-RU</option>
+          <option value="es-ES">Español (España) — es-ES</option>
+          <option value="es-MX">Español (México) — es-MX</option>
+          <option value="sv-SE">Svenska — sv-SE</option>
+          <option value="ta-IN">தமிழ் — ta-IN</option>
+          <option value="te-IN">తెలుగు — te-IN</option>
+          <option value="th-TH">ไทย — th-TH</option>
+          <option value="tr-TR">Türkçe — tr-TR</option>
+          <option value="uk-UA">Українська — uk-UA</option>
+          <option value="vi-VN">Tiếng Việt — vi-VN</option>
+          <option value="zh-HK">中文 · 粵語 (香港) — zh-HK</option>
+          <option value="zh-TW">中文 · 國語 (台灣) — zh-TW</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <h4>System Prompt</h4>
+      <div class="field">
+        <textarea id="s-sysprompt" rows="10" placeholder="Leave blank to use the bundled system prompt from prompts/system_api.txt"></textarea>
+        <div class="hint">Override the system prompt sent to the LLM. Placeholders &lt;prefabs_info&gt;, &lt;room_info&gt;, &lt;env_objects&gt; are substituted at runtime.</div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:6px">
+        <button class="btn" id="s-reset-prompt">Reset to default</button>
+        <button class="btn" id="s-view-prompt">Preview resolved</button>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <h4>Room</h4>
+      <div class="field">
+        <label for="s-room-w">Room width (m)</label>
+        <input type="number" id="s-room-w" value="12" min="4" max="30" step="0.5">
+      </div>
+      <div class="field">
+        <label for="s-room-d">Room depth (m)</label>
+        <input type="number" id="s-room-d" value="10" min="4" max="30" step="0.5">
+      </div>
+    </div>
+
+  </div>
+  <div class="settings-footer">
+    <button class="btn btn-primary" id="s-save">Save</button>
+    <button class="btn" id="s-cancel">Cancel</button>
+    <button class="btn btn-danger" id="s-clear-key" style="margin-left:auto">Clear key</button>
+  </div>
+ </div><!-- #settings-modal -->
+</div><!-- #settings-overlay -->
+
+<script type="module" src="js/demo.js?v=7"></script>
+</body>
+</html>

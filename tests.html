@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VR Mover · Unit Tests</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #c9d1d9;
+      --muted: #8b949e;
+      --green: #3fb950;
+      --red: #f85149;
+      --yellow: #d29922;
+      --blue: #58a6ff;
+      --radius: 6px;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      padding: 2rem;
+      min-height: 100vh;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    header h1 { font-size: 1.4rem; font-weight: 600; }
+    header a {
+      font-size: 0.85rem;
+      color: var(--blue);
+      text-decoration: none;
+    }
+    #summary {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      padding: 1rem 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 1rem;
+    }
+    #summary .stat { display: flex; align-items: center; gap: 0.4rem; }
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      min-width: 2.5rem;
+      text-align: center;
+    }
+    .badge-pass  { background: #1a3a1f; color: var(--green); border: 1px solid #2ea04326; }
+    .badge-fail  { background: #3a1a1a; color: var(--red);   border: 1px solid #f8514926; }
+    .badge-run   { background: #1c2535; color: var(--blue);  border: 1px solid #58a6ff26; }
+    #controls { margin-bottom: 2rem; display: flex; gap: .75rem; align-items: center; }
+    button {
+      padding: 6px 18px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    button:hover { background: #21262d; }
+    button.primary { background: #1f6feb; border-color: #1f6feb; color: #fff; }
+    button.primary:hover { background: #388bfd; }
+    #filter {
+      padding: 5px 12px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.9rem;
+      width: 220px;
+    }
+    #results { display: flex; flex-direction: column; gap: 6px; }
+    .result {
+      display: flex;
+      align-items: flex-start;
+      gap: .75rem;
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 0.88rem;
+    }
+    .result.pass { border-left: 3px solid var(--green); }
+    .result.fail { border-left: 3px solid var(--red); background: #1a0d0d; }
+    .result-icon { font-size: 1.1rem; line-height: 1; flex-shrink: 0; margin-top: 1px; }
+    .result-name { flex: 1; color: var(--text); }
+    .result-err  {
+      margin-top: 4px;
+      font-family: 'Cascadia Code', 'Fira Code', monospace;
+      font-size: 0.8rem;
+      color: var(--red);
+      white-space: pre-wrap;
+    }
+    #progress {
+      font-size: 0.85rem;
+      color: var(--muted);
+      min-height: 1.5rem;
+      margin-bottom: .5rem;
+    }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>VR Mover · Unit Tests</h1>
+  </header>
+
+  <div id="summary">
+    <div class="stat">Total <span id="stat-total" class="badge badge-run">—</span></div>
+    <div class="stat">Passed <span id="stat-pass" class="badge badge-pass">—</span></div>
+    <div class="stat">Failed <span id="stat-fail" class="badge badge-fail">—</span></div>
+  </div>
+
+  <div id="controls">
+    <button class="primary" id="btn-run">▶ Run All</button>
+    <input id="filter" placeholder="Filter by name…" type="search" />
+    <button id="btn-toggle-pass">Hide passing</button>
+  </div>
+
+  <div id="progress"></div>
+  <div id="results"></div>
+
+  <script type="module">
+    import { run } from './js/vr-mover.test.js';
+
+    const container = document.getElementById('results');
+    const progress  = document.getElementById('progress');
+    const statTotal = document.getElementById('stat-total');
+    const statPass  = document.getElementById('stat-pass');
+    const statFail  = document.getElementById('stat-fail');
+    const filterEl  = document.getElementById('filter');
+    let hidePass = false;
+
+    function render(results) {
+      const q = filterEl.value.toLowerCase();
+      container.innerHTML = '';
+      for (const r of results) {
+        if (q && !r.name.toLowerCase().includes(q)) continue;
+        if (hidePass && r.ok) continue;
+
+        const el = document.createElement('div');
+        el.className = `result ${r.ok ? 'pass' : 'fail'}`;
+        el.innerHTML = `
+          <span class="result-icon">${r.ok ? '✓' : '✗'}</span>
+          <div>
+            <div class="result-name">${r.name}</div>
+            ${r.error ? `<div class="result-err">${r.error}</div>` : ''}
+          </div>`;
+        container.appendChild(el);
+      }
+    }
+
+    document.getElementById('btn-toggle-pass').addEventListener('click', e => {
+      hidePass = !hidePass;
+      e.target.textContent = hidePass ? 'Show passing' : 'Hide passing';
+      if (window._lastResults) render(window._lastResults);
+    });
+
+    filterEl.addEventListener('input', () => {
+      if (window._lastResults) render(window._lastResults);
+    });
+
+    document.getElementById('btn-run').addEventListener('click', async () => {
+      container.innerHTML = '';
+      statTotal.textContent = statPass.textContent = statFail.textContent = '…';
+      progress.textContent = 'Running tests…';
+
+      let result;
+      try {
+        result = await run();
+      } catch (err) {
+        progress.textContent = `Fatal error: ${err.message}`;
+        return;
+      }
+
+      window._lastResults = result.results;
+      const { passed, failed, results } = result;
+      const total = passed + failed;
+
+      statTotal.textContent = total;
+      statPass.textContent = passed;
+      statFail.textContent = failed;
+      progress.textContent = failed === 0
+        ? `All ${total} tests passed ✓`
+        : `${failed} of ${total} tests failed`;
+
+      render(results);
+    });
+
+    // Auto-run on load
+    document.getElementById('btn-run').click();
+  </script>
+</body>
+</html>

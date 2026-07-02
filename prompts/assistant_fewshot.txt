@@ -1,0 +1,10 @@
+CREATE("Desk");
+MOVE("crt", x=9.08, z=9.48);
+FORWARD("crt", z=1);
+CREATE("Chair");
+MOVE("crt", x=9.08, z=8.58);
+LOOKAT("crt", x=9.08, z=9.48);
+CREATE("Bookshelf");
+MOVE("crt", x=9.72, z=6.18);
+FORWARD("crt", x=-1);
+MOVE("000001", z=5.00);

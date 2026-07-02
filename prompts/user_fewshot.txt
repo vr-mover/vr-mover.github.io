@@ -1,0 +1,29 @@
+{
+  "objects": [
+    {
+      "object_id": "000001",
+      "object_name": "Couch",
+      "position": { "x": "8.50", "z": "6.00" },
+      "scale": { "x": "1.00", "z": "1.00" },
+      "boundary": {
+        "Central": { "x": "8.50", "z": "6.00" },
+        "Size": { "x": "2.40", "z": "0.95" },
+        "Forward": { "x": "0.00", "z": "-1.00" }
+      }
+    }
+  ],
+  "hit_points": {
+    "points": [
+      {
+        "hit_id": "h-1",
+        "object": "WallXPositive",
+        "position": { "x": "9.94", "z": "6.18" }
+      }
+    ]
+  },
+  "drawing_lines": [],
+  "user_request": "I want a desk setup in this corner and put a bookshelf here. You can move the couch forward to leave space.",
+  "user_request_with_actions_inserted": "I want a desk setup in this corner and put a bookshelf here [<h-1>] you can move the couch forward to leave space",
+  "enabled_actions": "All the APIs are available",
+  "step_explain": "Debugging disabled, do not call EXPLAIN(string message);"
+}
